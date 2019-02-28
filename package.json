@@ -1,0 +1,31 @@
+{
+  "name": "project-2_musicweb",
+  "version": "1.0.0",
+  "description": "website listen to music online",
+  "main": "server.js",
+  "scripts": {
+    "client": "cd client && npm start",
+    "server": "nodemon server.js",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "build": "cd client && npm run build",
+    "start": "node server.js",
+    "heroku-postbuild": "cd client && npm install && npm install --only=dev --no-shrinkwrap && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/haitien/Project-2_MusicWeb.git"
+  },
+  "author": "team-ksclc",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/haitien/Project-2_MusicWeb/issues"
+  },
+  "homepage": "https://github.com/haitien/Project-2_MusicWeb#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.0"
+  }
+}
