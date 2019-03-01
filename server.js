@@ -21,10 +21,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //     );
 // });
 
-// only uncomment after  "npm run build"
-// process.env.NODE_ENV = 'production'
 
-if (process.env.NODE_ENV === 'production') {
+
+
+if (process.env.NODE_ENV === "production") {
     // Serve any static files
     app.use(express.static(path.join(__dirname, 'client/build')));
 
