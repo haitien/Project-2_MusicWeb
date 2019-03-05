@@ -1,5 +1,5 @@
 const pool = require('../dbConnect');
-async function seed() {
+const seed = async function () {
     await pool.query('TRUNCATE TABLE customers');
     await pool.query(
    "INSERT INTO customers( username,   password,   email) \
@@ -10,4 +10,4 @@ async function seed() {
     );
     pool.end();
 }
-seed();
+module.exports = seed;
