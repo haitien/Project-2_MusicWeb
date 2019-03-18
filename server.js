@@ -1,12 +1,13 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-
+const session = require('express-session');
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({ secret: 'this-is-a-secret-token-1', cookie: { maxAge: 60000 }}));
 
 // API calls
 
