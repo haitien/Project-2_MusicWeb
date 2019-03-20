@@ -207,7 +207,7 @@ class Register extends Component {
         }).then(json => {
             if (json.result) {
                 this.setState({error: ''});
-                this.props.history.push('/login')
+                this.props.history.push('/')
             } else {
                 this.setState({error: 'Error ! Please try again '})
             }

@@ -61,6 +61,9 @@ class UserController extends Controller {
             console.log(req.body);
             try {
                 const result = await User.addUser(req);
+                req.session.user = req.body;
+                delete req.session.user.password;
+                req.session.user.id = result.rows[0].id;
                 res.json({result: true});
                 console.log('addUser sql success')
             } catch (e) {

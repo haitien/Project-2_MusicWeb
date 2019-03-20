@@ -18,9 +18,9 @@ router.post('/login', function (req, res) {
 
 router.get('/is_login', function (req, res) {
    if (req.session.user) {
-      res.json({id: req.session.user.id, name: req.session.user.first_name, admin: req.session.user.is_admin})
+      res.json({...req.session.user})
    } else {
-      res.json({});
+      res.json(null);
    }
 });
 

@@ -46,7 +46,7 @@ class User extends Model {
         const d = req.body;
         const res = await pool.query(
             `INSERT INTO users( username,                password,                    email,             first_name,             last_name,              avatar,               date_of_birth,        is_admin) \
-                   VALUES ( '${d.username}',        '${crypt(d.password)}',     '${d.email}',      '${d.first_name}',        '${d.last_name}',      '${d.avatar}',        '${d.birthday}',       false);`);
+                   VALUES ( '${d.username}',        '${crypt(d.password)}',     '${d.email}',      '${d.first_name}',        '${d.last_name}',      '${d.avatar}',        '${d.birthday}',       false)  RETURNING id; `);
         return res;
     }
 

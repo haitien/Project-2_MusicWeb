@@ -13,8 +13,8 @@ class HomePage extends Component {
         fetch('/api/is_login').then(res => {
                 return res.json()
         }).then(json => {
-            if (json.id) {
-                this.setState({login: true, user_id: json.id, first_name: json.name, is_admin: json.admin})
+            if (json) {
+                this.setState({login: true, user_id: json.id, first_name: json.first_name, is_admin: json.is_admin,username: json.username})
             } else {
                 this.setState({login: false})
             }
