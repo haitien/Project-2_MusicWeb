@@ -26,6 +26,9 @@
       node database/seed/seeder.js
       ```
   - Chạy project:
-    * Chạy với chế độ nhà phát triển (development): tại cửa sổ cmd/terminal:  `npm run dev`
+    * Chạy với chế độ nhà phát triển (development): tại cửa sổ cmd/terminal:  `npm run dev`  , sau đó mở cửa sổ trình duyệt localhost:3000
     * Chạy với chế độ hoản chỉnh (production): tại cửa sổ cmd/terminal:  `npm run production` , sau đó mở localhost:5000 trên cửa sổ trình duyệt để sử dụng
+  - Đăng nhập: 
+    * Với tài khoản admin:  name1 và mật khẩu 12345678
+    * Với tài khoản thường: name2 và mật khẩu 12345678
  
