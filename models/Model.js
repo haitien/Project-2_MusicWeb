@@ -6,16 +6,7 @@ class Model {
     }
     async getAll(){
         const res = await pool.query(`SELECT * FROM ${this.table}`);
-        pool.end();
         return res.rows;
-    }
-    async get(id) {
-        const res = await pool.query(`SELECT * FROM ${this.table} WHERE ${this.idColumn} = ${id};`);
-        pool.end();
-        return res.rows;
-    }
-    async delete() {
-
     }
     
 }
