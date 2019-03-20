@@ -4,7 +4,7 @@ const User = require('../models/User');
 const usernameRegex = /^[a-z0-9_-]{3,16}$/;
 const emailRegex = /[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}/igm;
 const passwordRegex = /(?=.{8,})/;
-const nameRegex = /^[A-Za-z][A-Za-z']+([ A-Za-z][A-Za-z']+)*/;
+const nameRegex = /^(?!\s*$).+/;
 const defaultAvatar = 'https://dl.dropboxusercontent.com/s/l32nmhbq8wkkj47/avatar.png?dl=0';
 
 
@@ -24,7 +24,6 @@ class UserController extends Controller {
         const result = await User.getUser(id);
         if (result) {
             res.json(result)
-            console.log(result)
         }
     }
     async addUser(req, res) {
@@ -111,6 +110,19 @@ class UserController extends Controller {
         return res1
 
     }
+    async deleteImageFile (filePath){
+        const fetch = require('isomorphic-fetch');
+        const Dropbox = require('dropbox').Dropbox;
+        const dbx = new Dropbox({
+            accessToken: 'wXLQd5nNy4AAAAAAAAAAEGey-alEMw-sjQJgEjL07M9zsZtotxqGBqc1f-ACSVaY',
+            fetch: fetch
+        });
+        console.log(filePath);
+        let res = await dbx.filesDeleteV2({
+            path: filePath,
+        });
+    }
+
 
     addFileExtension(file) {
         if (file.mimetype === 'image/jpeg' && !file.originalname.endsWith('.jpg')) {
@@ -120,6 +132,55 @@ class UserController extends Controller {
             return file.originalname + '.png'
         }
         return file.originalname
+    }
+    async editUser(req, res) {
+        // console.log(req.body)
+        // console.log(req.file)
+        console.log('User controller editUser()');
+
+        const emailError = !emailRegex.test(req.body.email);
+        const firstNameError = !nameRegex.test(req.body.first_name);
+        const lastNameError = !nameRegex.test(req.body.last_name);
+        const passwordError = req.body.password && !passwordRegex.test(req.body.password);
+        const date = Date.parse(req.body.birthday);
+        const birthdayError = !date || date >= Date.now();
+        const valid =!emailError && !passwordError && !firstNameError && !lastNameError && !birthdayError;
+        console.log('editUser check validate ' + valid);
+        // console.log(req.file)
+        if (valid) {
+            if (req.file) {
+                try {
+                    const res1 = await this.uploadImageFile(req.file);
+                    const url = res1.url.replace('https://www.dropbox.com', 'https://dl.dropboxusercontent.com');
+                    console.log('upload avatar' + url);
+                    req.body.avatar = url
+                } catch (e) {
+                    console.log('upload error');
+                    console.log(e);
+                    res.json({result: false, error: e});
+                    return
+                }
+            }
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            let current_datetime = new Date(date);
+            req.body.birthday = current_datetime.getDate() + " " + months[current_datetime.getMonth()] + " " + current_datetime.getFullYear();
+            console.log('EditUser before postgres sql');
+            console.log(req.body);
+            try {
+                const result = await User.editUser(req);
+                res.json({result: true});
+                console.log('editUser sql success')
+            } catch (e) {
+                console.log('editUser sql error');
+                console.log(e);
+                res.json({result: false, error: e})
+            }
+        } else {
+            res.json({
+                result: false
+            })
+        }
+
     }
 }
 

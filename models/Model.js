@@ -6,7 +6,6 @@ class Model {
     }
     async getAll(){
         const res = await pool.query(`SELECT * FROM ${this.table}`);
-        pool.end();
         return res.rows;
     }
     

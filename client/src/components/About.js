@@ -1,6 +1,10 @@
 import React, {Component} from 'react'
 import logo from '../logo.svg';
 class About extends Component {
+    componentDidMount() {
+        fetch('/api/session');
+    }
+
     render() {
         return (
             <div className="App">

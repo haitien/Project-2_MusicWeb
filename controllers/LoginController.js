@@ -3,7 +3,6 @@ const User =  require('../models/User.js');
 class LoginController extends  Controller{
     async login(req, res, username, password) {
         const result = await User.checkLogin(username, password);
-
         if (result) {
             req.session.user = result;
             res.json({result: true})

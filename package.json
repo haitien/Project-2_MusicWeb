@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "client": "cd client && npm start",
-    "server": "node server.js",
+    "server": "nodemon server.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
     "production": "cd client && npm run build && cd .. && export NODE_ENV=production|| set NODE_ENV=production&& nodemon server.js",
     "production2": "export NODE_ENV=production|| set NODE_ENV=production&& nodemon server.js",

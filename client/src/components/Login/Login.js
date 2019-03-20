@@ -19,15 +19,15 @@ class Login extends Component {
         this.state = {
             username: '',
             password: '',
-            usernameIsValid: true,
-            passwordIsValid: true,
+            usernameInvalid: false,
+            passwordInvalid: false,
             loginFail: false
         }
     }
 
     login(event) {
         event.preventDefault();
-        if (!this.state.usernameIsValid || !this.state.passwordIsValid) {
+        if (this.state.usernameInvalid || this.state.passwordInvalid) {
             return;
         }
         const username = event.target['username'].value;
@@ -71,18 +71,18 @@ class Login extends Component {
     validateUsername(value) {
         const regex = /^\s+$/;
         if (!value || regex.test(value)) {
-            this.setState({usernameIsValid: false})
+            this.setState({usernameInvalid: true})
         } else {
-            this.setState({usernameIsValid: true})
+            this.setState({usernameInvalid: false})
         }
     }
 
     validatePassword(value) {
         const regex = /^\s+$/;
         if (!value || regex.test(value)) {
-            this.setState({passwordIsValid: false})
+            this.setState({passwordInvalid: true})
         } else {
-            this.setState({passwordIsValid: true})
+            this.setState({passwordInvalid: false})
         }
     }
 
@@ -103,17 +103,17 @@ class Login extends Component {
                                 <InputLabel htmlFor="username">Username</InputLabel>
                                 <Input id="username" name="username" autoComplete="username" autoFocus
                                        onChange={this.inputChange} onBlur={this.validate}
-                                       error={!this.state.usernameIsValid}/>
+                                       error={this.state.usernameInvalid}/>
                             </FormControl>
-                            {!this.state.usernameIsValid &&
+                            {this.state.usernameInvalid &&
                             <div className={style.alert}>Username must not be empty !</div>}
                             <FormControl margin="normal" required fullWidth>
                                 <InputLabel htmlFor="password">Password</InputLabel>
                                 <Input name="password" type="password" id="password" autoComplete="password"
                                        onChange={this.inputChange} onBlur={this.validate}
-                                       error={!this.state.passwordIsValid}/>
+                                       error={this.state.passwordInvalid}/>
                             </FormControl>
-                            {!this.state.passwordIsValid &&
+                            {this.state.passwordInvalid &&
                             <div className={style.alert}>Password must not be empty !</div>}
                             {this.state.loginFail && <div className={style.alert}>Wrong username or password !</div>}
                             <Button type="submit" fullWidth variant="contained" color="primary" className={style.login}>

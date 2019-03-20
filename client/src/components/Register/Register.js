@@ -13,6 +13,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 
 
 const avatar = 'https://dl.dropboxusercontent.com/s/l32nmhbq8wkkj47/avatar.png?dl=0'
+
 // const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
 
 class Register extends Component {
@@ -22,6 +23,7 @@ class Register extends Component {
             avatarSrc: avatar,
             avatarNew: avatar,
             avatarBlob: null,
+            // crop
             showCropBtn: false,
             showCropDialog: false,
             crop: {
@@ -31,6 +33,7 @@ class Register extends Component {
                 height: 10,
                 aspect: 1
             },
+            // data
             username: '',
             password: '',
             password_confirm: '',
@@ -38,6 +41,7 @@ class Register extends Component {
             last_name: '',
             email: '',
             birthday: '',
+            // flag to check
             usernameInvalid: false,
             passwordInvalid: false,
             password2Invalid: false,
@@ -45,6 +49,7 @@ class Register extends Component {
             lastNameInvalid: false,
             emailInvalid: false,
             birthdayInvalid: false,
+            // error message
             usernameError: '',
             passwordError: '',
             password2Error: '',
@@ -61,15 +66,12 @@ class Register extends Component {
         // })
     }
 
-    componentWillUnmount() {
-
-    }
-
     onChange = (event) => {
         const value = event.target.value;
         const name = event.target.name;
         this.setState({[name]: value})
     };
+
     onBlur = (event) => {
         const name = event.target.name;
         switch (name) {
@@ -165,7 +167,7 @@ class Register extends Component {
     }
 
     validateName(name, value) {
-        const regex = /^[A-Za-z][A-Za-z']+([ A-Za-z][A-Za-z']+)*/;
+        const regex = /^(?!\s*$).+/;
         const match = regex.test(value);
         if (name === "first_name") {
             this.setState({firstNameInvalid: !match});
@@ -300,7 +302,7 @@ class Register extends Component {
                                     <div className={styles.file}>
                                         <Typography variant='h6' align='center'>UPLOAD AVATAR</Typography>
                                         <input type='file' accept='image/*' name='avatar'
-                                               onInput={this.imageChange.bind(this)}/>
+                                               onChange={this.onImageChange}/>
                                     </div>
                                 </Grid>
                             </Grid>
@@ -319,13 +321,13 @@ class Register extends Component {
         );
     }
 
-    imageChange(event) {
+    onImageChange = (event) => {
         if (event.target.files.length === 1) {
             const url = URL.createObjectURL(event.currentTarget.files[0]);
             this.setState({avatarSrc: url, showCropBtn: true, avatarNew: url, avatarBlob: event.target.files[0]});
             this.cropImage(url, null)
         }
-    }
+    };
 
     onCropChange = (crop) => {
         this.setState({crop});
@@ -341,8 +343,9 @@ class Register extends Component {
     };
     doneCropDialog = async () => {
         this.setState({showCropDialog: false});
-        this.cropImage(this.state.avatarSrc,this.state.pixelCrop)
+        this.cropImage(this.state.avatarSrc, this.state.pixelCrop)
     };
+
     cropImage(source, pixelCrop) {
         const img = new Image();
         img.src = source;
@@ -363,7 +366,7 @@ class Register extends Component {
                     pixelCrop.y = height / 2 - width / 2
                 }
             }
-            const targetSize = (pixelCrop.width > 250) ? 250: pixelCrop.width;
+            const targetSize = (pixelCrop.width > 250) ? 250 : pixelCrop.width;
             const canvas = document.createElement('canvas');
             canvas.setAttribute('width', targetSize);
             canvas.setAttribute('height', targetSize);

@@ -5,16 +5,19 @@ class HomePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            logged: false,
+            login: false,
             user_id: '',
             first_name: '',
             is_admin: ''
         };
-        fetch('/api/is-logged').then(res => {
-            return res.json()
+        fetch('/api/is_login').then(res => {
+                return res.json()
         }).then(json => {
-            if (json.id)
-                this.setState({logged: true, user_id: json.id, first_name: json.name, is_admin: json.admin})
+            if (json.id) {
+                this.setState({login: true, user_id: json.id, first_name: json.name, is_admin: json.admin})
+            } else {
+                this.setState({login: false})
+            }
         })
     }
 
@@ -22,7 +25,7 @@ class HomePage extends Component {
         fetch('/api/logout').then(res => {
             return res.json()
         }).then(json => {
-            if (json.result) this.setState({logged: false})
+            if (json.result) this.setState({login: false})
         })
     };
 
@@ -30,16 +33,27 @@ class HomePage extends Component {
         return (
             <div className="App">
                 <h1>Home Page</h1>
-                {this.state.logged ?
+                {this.state.login ?
                     <div>Hello {this.state.first_name}
                         <div>
-                            <Button variant='contained' onClick={this.logout}>Log out</Button>
-                            <Button variant='contained' onClick={()=>{this.props.history.push('/user/edit')}}>Edit your profile</Button>
+                            <Button variant='contained' onClick={this.logout} color='primary'>Log out</Button>
+                            <Button variant='contained' color='primary' onClick={() => {
+                                this.props.history.push('/user/edit')
+                            }}>Edit your profile</Button>
                         </div>
                     </div> :
                     <div>
-                        <Button variant='contained' onClick={()=>{this.props.history.push('/login')}}>Login</Button>
+                        <Button color='primary' variant='contained' onClick={() => {
+                            this.props.history.push('/login')
+                        }}>Login</Button>
+                        <Button color='primary' variant='contained' onClick={() => {
+                            this.props.history.push('/register')
+                        }}>Register</Button>
                     </div>}
+
+                <Button color='primary' variant='contained' onClick={() => {
+                    this.props.history.push('/about')
+                }}>About</Button>
             </div>
         );
     }
