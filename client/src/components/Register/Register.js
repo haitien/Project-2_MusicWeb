@@ -7,16 +7,17 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import avatar from './../../images/avatar.png'
 import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css';
 import DialogTitle from "@material-ui/core/DialogTitle";
 
+
+const avatar = 'https://dl.dropboxusercontent.com/s/l32nmhbq8wkkj47/avatar.png?dl=0'
 // const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
 
 class Register extends Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             avatarSrc: avatar,
             avatarNew: avatar,
@@ -59,54 +60,56 @@ class Register extends Component {
         //     this.setState({avatarBlob: blob})
         // })
     }
-    componentWillUnmount(){
+
+    componentWillUnmount() {
 
     }
+
     onChange = (event) => {
-        const value = event.target.value
-        const name = event.target.name
+        const value = event.target.value;
+        const name = event.target.name;
         this.setState({[name]: value})
-    }
-    onBLur = (event) => {
-        const name = event.target.name
+    };
+    onBlur = (event) => {
+        const name = event.target.name;
         switch (name) {
             case 'username':
-                this.validateUsername()
-                break
+                this.validateUsername();
+                break;
             case 'email':
-                this.validateEmail()
-                break
+                this.validateEmail();
+                break;
             case 'password':
-                this.validatePassword()
-                break
+                this.validatePassword();
+                break;
             case 'password_confirm':
-                this.validatePasswordConfirm()
-                break
+                this.validatePasswordConfirm();
+                break;
             case 'first_name':
             case 'last_name':
-                const value = event.target.value
-                this.validateName(name, value)
-                break
+                const value = event.target.value;
+                this.validateName(name, value);
+                break;
             case 'birthday':
-                this.validateBirthday()
-                break
+                this.validateBirthday();
+                break;
             default:
                 break
         }
-    }
+    };
 
     validateUsername() {
-        const normalRegex = /^[a-z0-9_-]{3,16}$/
+        const normalRegex = /^[a-z0-9_-]{3,16}$/;
         if (!normalRegex.test(this.state.username)) {
             this.setState({
                 usernameInvalid: true,
                 usernameError: 'Username must have 3-16 characters & don\'t contain special characters !'
-            })
+            });
             return;
         } else {
             this.setState({usernameInvalid: false})
         }
-        fetch('api/register/validate', {
+        fetch('/api/register/validate', {
             method: 'POST',
             body: JSON.stringify({username: this.state.username}),
             headers: {
@@ -116,20 +119,20 @@ class Register extends Component {
         }).then(res => {
             return res.json()
         }).then(res => {
-            if (res.username) this.setState({usernameError: "Username is already in use !"})
+            if (res.username) this.setState({usernameError: "Username is already in use !"});
             this.setState({usernameInvalid: res.username})
         })
     }
 
     validateEmail() {
-        const emailRegex = /[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}/igm
+        const emailRegex = /[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}/igm;
         if (!emailRegex.test(this.state.email)) {
-            this.setState({emailInvalid: true, emailError: 'You need to enter an email !'})
+            this.setState({emailInvalid: true, emailError: 'You need to enter an email !'});
             return;
         } else {
             this.setState({emailInvalid: false})
         }
-        fetch('api/register/validate', {
+        fetch('/api/register/validate', {
             method: 'POST',
             body: JSON.stringify({email: this.state.email}),
             headers: {
@@ -139,13 +142,13 @@ class Register extends Component {
         }).then(res => {
             return res.json()
         }).then(res1 => {
-            if (res1.email) this.setState({emailError: "Email is already in use !"})
+            if (res1.email) this.setState({emailError: "Email is already in use !"});
             this.setState({emailInvalid: res1.email})
         })
     }
 
     validatePassword() {
-        const regex = /(?=.{8,})/
+        const regex = /(?=.{8,})/;
         if (!regex.test(this.state.password)) {
             this.setState({passwordInvalid: true, passwordError: 'Password must be 8 characters or longer !'})
         } else {
@@ -162,19 +165,19 @@ class Register extends Component {
     }
 
     validateName(name, value) {
-        const regex = /^[A-Za-z][A-Za-z']+([ A-Za-z][A-Za-z']+)*/
-        const match = regex.test(value)
+        const regex = /^[A-Za-z][A-Za-z']+([ A-Za-z][A-Za-z']+)*/;
+        const match = regex.test(value);
         if (name === "first_name") {
-            this.setState({firstNameInvalid: !match})
+            this.setState({firstNameInvalid: !match});
             this.setState({firstNameError: match || "First name is wrong !"})
         } else {
-            this.setState({lastNameInvalid: !match})
+            this.setState({lastNameInvalid: !match});
             this.setState({lastNameError: match || "Last name is wrong !"})
         }
     }
 
     validateBirthday() {
-        const date = Date.parse(this.state.birthday)
+        const date = Date.parse(this.state.birthday);
         if (date && date < Date.now()) {
             this.setState({birthdayInvalid: false})
         } else {
@@ -183,36 +186,36 @@ class Register extends Component {
     }
 
     register = (event) => {
-        event.preventDefault()
-        const valid = !this.state.usernameInvalid && !this.state.passwordInvalid && !this.state.password2Invalid && !this.state.firstNameInvalid && !this.state.lastNameInvalid && !this.state.emailInvalid && !this.state.birthdayInvalid
-        const form = new FormData()
-        form.append('username',this.state.username)
-        form.append('password',this.state.password)
-        form.append('email',this.state.email)
-        form.append('first_name',this.state.first_name)
-        form.append('last_name',this.state.last_name)
-        form.append('birthday',this.state.birthday)
-        form.append('avatar', this.state.avatarBlob)
-        if (!valid) return
-        fetch('api/register',{
+        event.preventDefault();
+        const valid = !this.state.usernameInvalid && !this.state.passwordInvalid && !this.state.password2Invalid && !this.state.firstNameInvalid && !this.state.lastNameInvalid && !this.state.emailInvalid && !this.state.birthdayInvalid;
+        const form = new FormData();
+        form.append('username', this.state.username);
+        form.append('password', this.state.password);
+        form.append('email', this.state.email);
+        form.append('first_name', this.state.first_name);
+        form.append('last_name', this.state.last_name);
+        form.append('birthday', this.state.birthday);
+        form.append('avatar', this.state.avatarBlob);
+        if (!valid) return;
+        fetch('/api/register', {
             method: 'POST',
             body: form
-        }).then(res=>{
+        }).then(res => {
             return res.json()
-        }).then(json=>{
+        }).then(json => {
             if (json.result) {
-                this.setState({error: ''})
+                this.setState({error: ''});
                 this.props.history.push('/login')
             } else {
                 this.setState({error: 'Error ! Please try again '})
             }
         })
-    }
+    };
 
     render() {
         return (
             <Grid container>
-                <Grid item sm={3} xs={false}></Grid>
+                <Grid item sm={3} xs={false}/>
                 <Grid item sm={6}>
                     <Paper className={styles.paper}>
                         <form onSubmit={this.register}>
@@ -220,31 +223,36 @@ class Register extends Component {
                                 <Grid item sm={7} xs={7} className={styles.main}>
                                     <Typography component='h1' variant='h4' className={styles.header}>Sign
                                         up</Typography>
-                                    {this.state.error !== '' && <div style={{textSize:'16px', color: "#FF322A", margin: '15px'}}>{this.state.error}</div>}
+                                    {this.state.error !== '' && <div style={{
+                                        textSize: '16px',
+                                        color: "#FF322A",
+                                        margin: '15px'
+                                    }}>{this.state.error}</div>}
                                     <FormControl margin="normal" required fullWidth className={styles.control}>
                                         <InputLabel htmlFor="username">Username</InputLabel>
                                         <Input id="username" name="username" autoComplete="username" autoFocus
-                                               onChange={this.onChange} onBlur={this.onBLur}/>
+                                               onChange={this.onChange} onBlur={this.onBlur}/>
                                     </FormControl>
                                     {this.state.usernameInvalid &&
                                     <div className={styles.alert}>{this.state.usernameError}</div>}
                                     <FormControl margin="normal" required fullWidth className={styles.control}>
                                         <InputLabel htmlFor="email">Email</InputLabel>
                                         <Input type='email' id="email" name="email" autoComplete="email"
-                                               onChange={this.onChange} onBlur={this.onBLur}/>
+                                               onChange={this.onChange} onBlur={this.onBlur}/>
                                     </FormControl>
                                     {this.state.emailInvalid &&
                                     <div className={styles.alert}>{this.state.emailError}</div>}
                                     <FormControl margin="normal" required fullWidth className={styles.control}>
                                         <InputLabel htmlFor="password">Password</InputLabel>
                                         <Input type='password' id="password" name="password" autoComplete="password"
-                                               onChange={this.onChange} onBlur={this.onBLur}/>
+                                               onChange={this.onChange} onBlur={this.onBlur}/>
                                     </FormControl>
                                     {this.state.passwordInvalid &&
                                     <div className={styles.alert}>{this.state.passwordError}</div>}
                                     <FormControl margin="normal" required fullWidth className={styles.control}>
                                         <InputLabel htmlFor="password_confirm">Password confirm</InputLabel>
-                                        <Input type='password' id="password_confirm" name="password_confirm" onChange={this.onChange} onBlur={this.onBLur}/>
+                                        <Input type='password' id="password_confirm" name="password_confirm"
+                                               onChange={this.onChange} onBlur={this.onBlur}/>
                                     </FormControl>
                                     {this.state.password2Invalid &&
                                     <div className={styles.alert}>{this.state.password2Error}</div>}
@@ -253,7 +261,7 @@ class Register extends Component {
                                             <FormControl margin="normal" required fullWidth className={styles.control}>
                                                 <InputLabel htmlFor="first_name">First name</InputLabel>
                                                 <Input id="first_name" name="first_name" onChange={this.onChange}
-                                                       onBlur={this.onBLur}/>
+                                                       onBlur={this.onBlur}/>
                                             </FormControl>
                                             {this.state.firstNameInvalid &&
                                             <div className={styles.alert}>{this.state.firstNameError}</div>}
@@ -262,7 +270,7 @@ class Register extends Component {
                                             <FormControl margin="normal" required fullWidth className={styles.control}>
                                                 <InputLabel htmlFor="last_name">Last name</InputLabel>
                                                 <Input id="last_name" name="last_name" onChange={this.onChange}
-                                                       onBlur={this.onBLur}/>
+                                                       onBlur={this.onBlur}/>
                                             </FormControl>
                                             {this.state.lastNameInvalid &&
                                             <div className={styles.alert}>{this.state.lastNameError}</div>}
@@ -272,7 +280,7 @@ class Register extends Component {
                                         <TextField label="Birthday" type="date" InputLabelProps={{shrink: true}}
                                                    name='birthday'
                                                    style={{marginTop: '15px'}} onChange={this.onChange}
-                                                   onBlur={this.onBLur} required/>
+                                                   onBlur={this.onBlur} required/>
                                         {this.state.birthdayInvalid &&
                                         <div className={styles.alert}>{this.state.birthdayError}</div>}
                                     </FormControl>
@@ -284,7 +292,7 @@ class Register extends Component {
                                 <Grid className={styles.right} item sm={5} xs={5}>
                                     <div className={styles.avatarHolder}>
                                         <img src={this.state.avatarNew} alt="" className={styles.avatar}/>
-                                        <div></div>
+                                        <div/>
                                         {this.state.showCropBtn &&
                                         <Button size='small' variant='contained' color='primary' type='button'
                                                 onClick={this.openCropDialog}>Crop</Button>}
@@ -292,13 +300,12 @@ class Register extends Component {
                                     <div className={styles.file}>
                                         <Typography variant='h6' align='center'>UPLOAD AVATAR</Typography>
                                         <input type='file' accept='image/*' name='avatar'
-                                               onChange={this.imageChange.bind(this)}/>
+                                               onInput={this.imageChange.bind(this)}/>
                                     </div>
                                 </Grid>
                             </Grid>
                         </form>
                     </Paper>
-                    {/*<img src="https://dl.dropboxusercontent.com/s/79str86hrq4zp2k/a.jpg?dl=0" alt=""/>*/}
                 </Grid>
                 <Grid item sm={3} xs={false}>
                     <Dialog open={this.state.showCropDialog} onClose={this.closeCropDialog}>
@@ -314,55 +321,70 @@ class Register extends Component {
 
     imageChange(event) {
         if (event.target.files.length === 1) {
-            const url = URL.createObjectURL(event.target.files[0])
-            this.setState({avatarSrc: url, showCropBtn: true, avatarNew: url, avatarBlob: event.target.files[0]})
+            const url = URL.createObjectURL(event.currentTarget.files[0]);
+            this.setState({avatarSrc: url, showCropBtn: true, avatarNew: url, avatarBlob: event.target.files[0]});
+            this.cropImage(url, null)
         }
     }
 
     onCropChange = (crop) => {
         this.setState({crop});
-    }
-    openCropDialog = (event) => {
+    };
+    openCropDialog = () => {
         this.setState({showCropDialog: true})
-    }
-    closeCropDialog = (event) => {
+    };
+    closeCropDialog = () => {
         this.setState({showCropDialog: false})
-    }
+    };
     completeCropDialog = (crop, pixel) => {
         this.setState({crop, pixelCrop: pixel});
-    }
-    preloadImage = (url, crossOrigin = 'anonymous') => (
-        new Promise((resolve, reject) => {
-            let img = new Image();
-            img.crossOrigin = crossOrigin;
-            img.onload = () => resolve(img);
-            img.onerror = reject;
-            img.src = url
-        })
-    );
-    doneCropDialog = async (event) => {
-        this.setState({showCropDialog: false})
-        const image = await this.preloadImage(this.state.avatarSrc)
-        const canvas = document.createElement('canvas');
-        canvas.setAttribute('width', this.state.pixelCrop.width);
-        canvas.setAttribute('height', this.state.pixelCrop.height);
-        const context = canvas.getContext('2d');
-        context.drawImage(
-            image,
-            this.state.pixelCrop.x,
-            this.state.pixelCrop.y,
-            this.state.pixelCrop.width,
-            this.state.pixelCrop.height,
-            0,
-            0,
-            this.state.pixelCrop.width,
-            this.state.pixelCrop.height
-        );
-        canvas.toBlob(blob => {
-            blob.name = 'new_name'
-            const blobUrl = URL.createObjectURL(blob);
-            this.setState({avatarNew: blobUrl, avatarBlob: blob})
-        }, 'image/jpeg')
+    };
+    doneCropDialog = async () => {
+        this.setState({showCropDialog: false});
+        this.cropImage(this.state.avatarSrc,this.state.pixelCrop)
+    };
+    cropImage(source, pixelCrop) {
+        const img = new Image();
+        img.src = source;
+        img.onload = () => {
+            if (pixelCrop == null) {
+                pixelCrop = {};
+                const width = img.width;
+                const height = img.height;
+                if (width > height) {
+                    pixelCrop.width = height;
+                    pixelCrop.height = height;
+                    pixelCrop.x = width / 2 - height / 2;
+                    pixelCrop.y = 0
+                } else {
+                    pixelCrop.width = width;
+                    pixelCrop.height = width;
+                    pixelCrop.x = 0;
+                    pixelCrop.y = height / 2 - width / 2
+                }
+            }
+            const targetSize = (pixelCrop.width > 250) ? 250: pixelCrop.width;
+            const canvas = document.createElement('canvas');
+            canvas.setAttribute('width', targetSize);
+            canvas.setAttribute('height', targetSize);
+            const context = canvas.getContext('2d');
+            context.drawImage(
+                img,
+                pixelCrop.x,
+                pixelCrop.y,
+                pixelCrop.width,
+                pixelCrop.width,
+                0,
+                0,
+                targetSize,
+                targetSize
+            );
+            canvas.toBlob(blob => {
+                // blob.name = 'new_name';
+                const blobUrl = URL.createObjectURL(blob);
+                this.setState({avatarNew: blobUrl, avatarBlob: blob})
+            }, 'image/jpeg')
+        }
     }
 }
 

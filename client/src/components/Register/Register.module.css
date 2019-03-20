@@ -20,10 +20,6 @@
     text-align: center;
     margin-top: 10px !important;
 }
-.form{
-    width: available;
-    margin: 10px 10px;
-}
 .control{
     margin: 8px 0 4px!important;
 }
@@ -45,19 +41,9 @@
     width: 200px;
     height: 200px;
     object-fit: cover;
-    border-radius: 100%;
+    border-radius: 50%;
     padding: 5px;
     background-color: white;
-}
-.avatarHolder1{
-    text-align: center;
-    width: 200px;
-    height: 200px;
-    background-position: center;
-    background-size:cover;
-    border-radius: 100%;
-    border: white solid 3px;
-    background-repeat: no-repeat;
 }
 .avatarHolder{
     text-align: center;

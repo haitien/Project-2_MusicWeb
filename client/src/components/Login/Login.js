@@ -14,8 +14,8 @@ import Grid from '@material-ui/core/Grid'
 class Login extends Component {
     constructor(props) {
         super(props);
-        this.inputChange = this.inputChange.bind(this)
-        this.validate = this.validate.bind(this)
+        this.inputChange = this.inputChange.bind(this);
+        this.validate = this.validate.bind(this);
         this.state = {
             username: '',
             password: '',
@@ -30,8 +30,8 @@ class Login extends Component {
         if (!this.state.usernameIsValid || !this.state.passwordIsValid) {
             return;
         }
-        const username = event.target['username'].value
-        const password = event.target['password'].value
+        const username = event.target['username'].value;
+        const password = event.target['password'].value;
         fetch('/api/login', {
             method: 'POST',
             body: JSON.stringify({username: username, password: password}),
@@ -51,7 +51,7 @@ class Login extends Component {
     }
 
     inputChange(event) {
-        const value = event.target.value
+        const value = event.target.value;
         if (event.target.name === 'username') {
             this.setState({username: value})
         } else {
@@ -89,7 +89,7 @@ class Login extends Component {
     render() {
         return (
             <Grid container>
-                <Grid item xs={false} sm={4}></Grid>
+                <Grid item xs={false} sm={4}/>
                 <Grid item xs={12} sm={4}>
                     <Paper className={style.paper}>
                         <Avatar className={style.avatar}>
@@ -126,7 +126,7 @@ class Login extends Component {
                         </form>
                     </Paper>
                 </Grid>
-                <Grid item xs={false} sm={4}></Grid>
+                <Grid item xs={false} sm={4}/>
             </Grid>
         )
     }

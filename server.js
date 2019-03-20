@@ -8,16 +8,18 @@ const FileStore = require('session-file-store')(session);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-    resave: false,
-    saveUninitialized: true,
+    // resave: true,
+    // saveUninitialized: true,
     store: new FileStore(),
     secret: 'this-is-a-secret-token-1',
     cookie: { maxAge: 60000 }
 }));
-
+const user_router = require('./route/user_router.js')
+app.use('/api/user', user_router)
 // API calls
-const router = require('./route/router.js')
+const router = require('./route/router.js');
 app.use('/api', router);
+
 
 
 
