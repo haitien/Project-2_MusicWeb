@@ -12,7 +12,7 @@ import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css';
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
+// const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024;
 
 class Register extends Component {
     constructor(props) {
@@ -193,6 +193,7 @@ class Register extends Component {
         form.append('last_name',this.state.last_name)
         form.append('birthday',this.state.birthday)
         form.append('avatar', this.state.avatarBlob)
+        if (!valid) return
         fetch('api/register',{
             method: 'POST',
             body: form
@@ -200,8 +201,8 @@ class Register extends Component {
             return res.json()
         }).then(json=>{
             if (json.result) {
-                this.props.history.push('/login')
                 this.setState({error: ''})
+                this.props.history.push('/login')
             } else {
                 this.setState({error: 'Error ! Please try again '})
             }
@@ -219,7 +220,7 @@ class Register extends Component {
                                 <Grid item sm={7} xs={7} className={styles.main}>
                                     <Typography component='h1' variant='h4' className={styles.header}>Sign
                                         up</Typography>
-                                    {this.state.error !== '' && <div style={{textSize:'16px', color: "#FF322A"}}>{this.state.error}</div>}
+                                    {this.state.error !== '' && <div style={{textSize:'16px', color: "#FF322A", margin: '15px'}}>{this.state.error}</div>}
                                     <FormControl margin="normal" required fullWidth className={styles.control}>
                                         <InputLabel htmlFor="username">Username</InputLabel>
                                         <Input id="username" name="username" autoComplete="username" autoFocus
