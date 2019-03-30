@@ -20,7 +20,8 @@
 .login{
     margin-top: 15px !important;
 }
-.alert{
-    font-size: 14px;
-    color: red;
+.alert {
+    font-size: 13px;
+    color: #ff2115;
+    font-family: 'Avenir', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif;
 }

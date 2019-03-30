@@ -1,30 +1,39 @@
 const express = require('express');
 const multer = require('multer');
+const API = require('../js/api_constants');
 const upload = multer();
+// const upload = multer({dest: 'client/build/static/upload/'})
 const UserController = require('../controllers/UserController');
 const LoginController = require('../controllers/LoginController');
-// const upload = multer({dest: 'client/build/static/upload/'})
 const router = express.Router();
 
-router.use(function (req, res, next) {
-    if (req.session.user) {
+router.use((request, response, next) => {
+    if (request.session.user && !request.session.user.is_admin) {
         next();
     } else {
-        res.statusCode = 401;
-        res.json({error: 'unauthorized'})
+        response.status(401).end()
     }
 });
 
-router.get('/edit_profile', function (req, res) {
-    UserController.getUser(req, res, req.session.user.id);
+router.get(API.EDIT_PROFILE, (request, response) => {
+    UserController.getUser(request, response, request.session.user.id);
 });
 
-router.post('/edit_profile', upload.single('avatar'), function (req, res) {
-    UserController.editUser(req, res)
+router.post(API.LOGOUT, (request, response) => {
+    request.session.user = null;
+    response.end()
 });
 
-router.post('/check_password', function (req, res) {
-    LoginController.login(req, res, req.body.username, req.body.password)
+router.get(API.IS_USER, (request, response) => {
+    response.json({...request.session.user});
+});
+
+router.post(API.EDIT_PROFILE, upload.single('avatar'), (request, response) => {
+    UserController.editUser(request, response)
+});
+
+router.post(API.CHECK_PASSWORD, (request, response) => {
+    UserController.checkPassword(request, response, request.session.user.username, request.body.password)
 });
 
 module.exports = router;

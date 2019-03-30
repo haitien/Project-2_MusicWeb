@@ -1,0 +1,18 @@
+.wrapper{
+    margin: 5px 20px;
+    border-radius: 3px;
+    background-color: #35b7f3;
+    flex: auto;
+    display: flex;
+    align-items: center;
+    height: 30px;
+    position: relative;
+}
+.seach_icon {
+    /*position: absolute;*/
+    left: 0;
+    top: 0;
+}
+.input{
+    flex: auto;
+}

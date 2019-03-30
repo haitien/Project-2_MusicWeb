@@ -5,23 +5,24 @@ const session = require('express-session');
 const app = express();
 const port = process.env.PORT || 5000;
 const FileStore = require('session-file-store')(session);
-
+const API = require('./js/api_constants');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-    // resave: false,
-    // saveUninitialized: true,
+    resave: false,
+    saveUninitialized: true,
     store: new FileStore(),
     secret: 'this-is-a-secret-token-1',
     cookie: { maxAge: 600*1000 }
 }));
 
-const user_router = require('./route/user_router.js');
-app.use('/api/user', user_router);
-// API calls
-const router = require('./route/router.js');
-app.use('/api', router);
+const guest_router = require('./route/guest_router');
+app.use(API.GUEST, guest_router);
+const user_router = require('./route/user_router');
+app.use(API.USER, user_router);
+const admin_router = require('./route/admin_router');
+app.use(API.ADMIN, admin_router);
 
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -30,8 +31,8 @@ if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, 'client/build')));
 
     // Handle React routing, return all requests to React app
-    app.get('*', function(req, res) {
-        res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+    app.get('*', (request, response) => {
+        response.sendFile(path.join(__dirname, 'client/build', 'index.html'));
     });
 }
 

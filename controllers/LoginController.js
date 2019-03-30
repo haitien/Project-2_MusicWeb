@@ -1,22 +1,21 @@
-const Controller = require('./Controller.js');
-const User =  require('../models/User.js');
+const Controller = require('./Controller');
+const User =  require('../models/User');
+
 class LoginController extends  Controller{
-    async login(req, res, username, password) {
-        const result = await User.checkLogin(username, password);
-        if (result) {
-            req.session.user = result;
-            res.json({result: true})
-        } else {
-            res.json({result: false})
+    async login(request, response, username, password) {
+        try {
+            console.log('Login controller => login ', username, password);
+            const result = await User.checkLogin(username, password);
+            if (result) {
+                delete result.password;
+                request.session.user = result;
+                response.json({...result})
+            } else {
+                response.status(401).end()
+            }
+        } catch (e) {
+            response.status(503).end()
         }
-    }
-    logout(req, res) {
-        if (req.session.user) {
-           req.session.user = null;
-           res.json({result: true});
-           return
-        }
-        res.json({result: false})
     }
 }
 module.exports = new LoginController();

@@ -1,1 +1,1 @@
-require('./user.js')();
+require('./user')();
