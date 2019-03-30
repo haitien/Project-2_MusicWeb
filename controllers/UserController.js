@@ -9,13 +9,14 @@ class UserController extends Controller {
     async validateData(request, response, data) {
         try {
             console.log('User controller => validateData', data);
-            if (data.username) {
-                const result = await User.checkUsernameExist(data.username);
+            const {username, email} = data;
+            if (username) {
+                const result = await User.checkUsernameExist(username);
                 response.json({username: result});
                 return
             }
-            if (data.email) {
-                const result = await User.checkEmailExist(data.email);
+            if (email) {
+                const result = await User.checkEmailExist(email);
                 response.json({email: result});
                 return
             }
@@ -24,6 +25,7 @@ class UserController extends Controller {
             response.end()
         }
     }
+
     async checkPassword(request, response, username, password) {
         try {
             console.log('User controller => checkPassword', username, password);
@@ -33,6 +35,7 @@ class UserController extends Controller {
             response.status(503).end();
         }
     }
+
     async getUser(req, response, id) {
         try {
             console.log('User controller => get user', id);
@@ -46,6 +49,7 @@ class UserController extends Controller {
             response.status(503).end();
         }
     }
+
     async addUser(request, response) {
         console.log('UserController => add user', request.body);
         const {username, email, password, first_name, last_name, birthday} = request.body;
@@ -96,7 +100,7 @@ class UserController extends Controller {
 
     async editUser(request, response) {
         console.log('User controller => editUser', request.body);
-        const username = request.session.user.username;
+        const {username, avatar} = request.session.user;
         const {email, old_password, new_password, first_name, last_name, birthday} = request.body;
         try {
             const emailValid = validator.isEmail(email);
@@ -107,10 +111,9 @@ class UserController extends Controller {
             if (old_password && new_password) {
                 passwordValid = AppConstant.REGEX_PASSWORD.test(new_password) && User.checkLogin(username, old_password);
             } else {
-                delete request.body.old_password;
                 delete request.body.new_password;
             }
-            const valid =emailValid && firstNameValid && lastNameValid && birthdayValid && passwordValid;
+            const valid = emailValid && firstNameValid && lastNameValid && birthdayValid && passwordValid;
             console.log('Edit user check validate ', valid);
             if (!valid) {
                 response.status(503).end();
@@ -122,9 +125,14 @@ class UserController extends Controller {
         }
         try {
             if (request.file) {
-                const res1 = await this.uploadImageFile(request.file);
+                const res1 = await Utils.uploadImageFile(request.file);
                 const url = Utils.convertLinkDropbox(res1.url);
-                // TODO delete old avatar
+                try {
+                    console.log('Delete avatar ', avatar);
+                    Utils.deleteImageFile(avatar);
+                } catch (e) {
+                    //  nothing to do
+                }
                 console.log('Upload avatar ', url);
                 request.body.avatar = url
             } else {
@@ -144,7 +152,7 @@ class UserController extends Controller {
             response.json({...result.rows[0]});
             console.log('Edit user sql success ', result.rows[0]);
         } catch (e) {
-            console.log('Edit user sql error' , e);
+            console.log('Edit user sql error', e);
             response.status(503).end();
         }
     }

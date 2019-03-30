@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import Grid from "@material-ui/core/Grid";
 import styles from './EditProfile.module.css'
-import {AppBar, Dialog} from "@material-ui/core";
+import {Dialog} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import CameraAlt from '@material-ui/icons/CameraAltOutlined'
 import Button from "@material-ui/core/Button";
@@ -28,20 +28,20 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import LinearProgress from "@material-ui/core/LinearProgress";
+import avatarImg from '../../../images/avatar.jpg';
 
 class EditProfile extends Component {
     constructor(props) {
         super(props);
         const temp = {isInvalid: false, message: ''};
         this.state = {
-            avatarSrc: '',
-            avatarNew: '',
+            avatarSrc: avatarImg,
+            avatarNew: avatarImg,
             avatarBlob: null,
-            editPassword: false,
+            editPass: false,
             showPass: false,
-            error: '',
             loading: false,
-            data: {first_name: '', last_name: '', id: '', avatar: ''},
+            data: {first_name: 'first_name', last_name: 'last_name', id: 'id'},
             // crop
             showCropBtn: false,
             showCropDialog: false,
@@ -54,6 +54,7 @@ class EditProfile extends Component {
             last_name: '',
             birthday: '',
             //error
+            error: '',
             _email: temp,
             _old_password: temp,
             _new_password: temp,
@@ -94,19 +95,18 @@ class EditProfile extends Component {
             }
         });
         axios.get(API.USER + API.EDIT_PROFILE).then(response => {
+            console.log('EditProfile => get profile', response.data);
             response.data.date_of_birth = Utils.formatDate(response.data.date_of_birth);
             this.setState({
                 avatarNew: response.data.avatar,
                 avatarSrc: response.data.avatar,
                 data: response.data,
-
                 email: response.data.email,
-                old_password: '',
                 first_name: response.data.first_name,
                 last_name: response.data.last_name,
                 birthday: response.data.date_of_birth,
             })
-        }).catch(error => {
+        }).catch(() => {
             this.props.history.push('/401')
         });
     };
@@ -141,8 +141,9 @@ class EditProfile extends Component {
         }
         const {isInvalid} = this.validator.validate({email: email});
         if (isInvalid) return;
-        axios.post(API.GUEST + API.VALIDATE, {email: email}).then(res => {
-            if (res.data.email) {
+        axios.post(API.GUEST + API.VALIDATE, {email: email}).then(response => {
+            console.log('EditProfile => check exist email', response.data);
+            if (response.data.email) {
                 this.setState({_email: {isInvalid: true, message: 'Email is already in use !'}})
             } else {
                 this.setState({_email: {isInvalid: false, message: ''}})
@@ -160,32 +161,29 @@ class EditProfile extends Component {
         const {isInvalid} = this.validator.validate({old_password: old_password});
         if (isInvalid) return;
         axios.post(API.USER + API.CHECK_PASSWORD, {password: old_password}).then(response => {
+            console.log('EditProfile => check right password', response.data);
             if (response.data.result) {
                 this.setState({_old_password: {isInvalid: false, message: ''}})
             } else {
                 this.setState({_old_password: {isInvalid: true, message: 'Not match your current password!'}})
             }
-        }).catch(error => {
+        }).catch(() => {
             this.props.history.push('/401');
         });
     }
 
-    handleClickShowPassword = () => {
-        this.setState(prevState => ({showPass: !prevState.showPass}))
-    };
-
     editProfile = (event) => {
         this.setState({loading: true, error: ''});
         event.preventDefault();
-        const {email, old_password, new_password, first_name, last_name, birthday, editPassword, data} = this.state;
+        const {email, old_password, new_password, first_name, last_name, birthday, editPass, data, avatarBlob} = this.state;
         let temp = null;
-        if (editPassword) {
+        if (editPass) {
             temp = {email, old_password, new_password, first_name, last_name, birthday};
         } else {
             temp = {email, first_name, last_name, birthday};
         }
         const result = this.validator.validateAll(temp);
-        console.log('validate result', temp);
+        console.log('Validate result', temp);
         const form = new FormData();
         Object.keys(result).filter(key => (key !== 'isValid')).forEach(item => {
             this.setState({['_' + item]: result[item]});
@@ -195,10 +193,8 @@ class EditProfile extends Component {
             this.setState({loading: false, error: ''});
             return;
         }
-        if (!editPassword && email === data.email && first_name === data.first_name && last_name === data.last_name && birthday === data.date_of_birth) {
-            // TODO show nothing change
-            console.log('not thing change');
-            this.setState({loading: false, error: ''});
+        if (!editPass && email === data.email && first_name === data.first_name && last_name === data.last_name && birthday === data.date_of_birth && !avatarBlob) {
+            this.setState({loading: false, error: 'Nothing has changed!'});
             return;
         }
         form.append('avatar', this.state.avatarBlob);
@@ -216,18 +212,18 @@ class EditProfile extends Component {
     };
 
     render() {
-        const {email, first_name, last_name, birthday, error, data, avatarNew, avatarSrc, editPassword, showPass, loading} = this.state;
+        const {email, first_name, last_name, birthday, error, data, avatarNew, avatarSrc, editPass, showPass, loading} = this.state;
         const {_email, _first_name, _last_name, _old_password, _new_password, _birthday} = this.state;
         return (
-            <div>
-                <AppBar>
-                    <Link to='/' style={{cursor: 'pointer', textDecoration: 'none'}}>
+            <div className={styles.big_wrapper}>
+                <div className={styles.navbar}>
+                    <Link to='/' className={styles.brand}>
                         <Typography variant="h5" style={{color: 'white'}}>
                             Home page
                         </Typography>
                     </Link>
-                </AppBar>
-                <div className={styles.main}>
+                </div>
+                <div className={styles.wrapper}>
                     {loading && <LinearProgress color='secondary'/>}
                     <Grid container>
                         <Grid item md={3} sm={1} xs={false}/>
@@ -237,7 +233,7 @@ class EditProfile extends Component {
                                 <Grid item sm={1} xs={false}/>
                                 <Grid item sm={10} xs={12}>
                                     <form onSubmit={this.editProfile}>
-                                        <Grid container spacing={8} style={{alignItems:'center'}}>
+                                        <Grid container spacing={8} style={{alignItems: 'center'}}>
                                             <Grid item sm={5} xs={12} style={{overFlow: 'hidden'}}>
                                                 <div className={styles.avatarHolder}>
                                                     <img src={avatarNew} alt="Avatar" className={styles.avatar}/>
@@ -261,7 +257,7 @@ class EditProfile extends Component {
                                                 </h3>
                                             </Grid>
                                         </Grid>
-                                        <div className={styles.big_alert}>{error !== '' && error}</div>
+                                        {error !== '' && <div className={styles.big_alert}>{error}</div>}
                                         <FormControl margin="normal" fullWidth className={styles.control}>
                                             <InputLabel htmlFor="email">Email</InputLabel>
                                             <Input type='email' name="email" onChange={this.onChange}
@@ -272,7 +268,7 @@ class EditProfile extends Component {
                                         <FormControlLabel style={{width: '100%'}}
                                                           control={
                                                               <Checkbox
-                                                                  checked={editPassword}
+                                                                  checked={editPass}
                                                                   onChange={this.setCheck} name="editPassword"/>
                                                           }
                                                           label="Change password"/>
@@ -280,7 +276,7 @@ class EditProfile extends Component {
                                             <InputLabel htmlFor="old_password">Old password</InputLabel>
                                             <Input type={showPass ? 'text' : 'password'} name="old_password"
                                                    onChange={this.onChange} onBlur={this.onBlur}
-                                                   disabled={!editPassword}
+                                                   disabled={!editPass}
                                                    endAdornment={
                                                        <InputAdornment position="end">
                                                            <IconButton
@@ -292,14 +288,14 @@ class EditProfile extends Component {
                                                    }/>
                                         </FormControl>
                                         <div
-                                            className={styles.alert}>{editPassword && _old_password.isInvalid && _old_password.message}</div>
+                                            className={styles.alert}>{editPass && _old_password.isInvalid && _old_password.message}</div>
                                         <FormControl margin="normal" fullWidth className={styles.control}>
                                             <InputLabel htmlFor="new_password">New password</InputLabel>
                                             <Input type='password' name="new_password"
-                                                   onChange={this.onChange} disabled={!editPassword}/>
+                                                   onChange={this.onChange} disabled={!editPass}/>
                                         </FormControl>
                                         <div
-                                            className={styles.alert}>{editPassword && _new_password.isInvalid && _new_password.message}</div>
+                                            className={styles.alert}>{editPass && _new_password.isInvalid && _new_password.message}</div>
                                         <Grid container spacing={16}>
                                             <Grid item sm={6}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}>
@@ -343,16 +339,22 @@ class EditProfile extends Component {
                                 <Button onClick={this.doneCropDialog} fullWidth>Done</Button>
                             </Dialog>
                         </Grid>
-
                     </Grid>
                 </div>
             </div>
         )
     }
 
+    handleClickShowPassword = () => {
+        if (!this.state.editPass) {
+            this.setState({showPass: false});
+            return
+        }
+        this.setState(prevState => ({showPass: !prevState.showPass}))
+    };
     setCheck = () => {
         this.setState(preState => ({
-            editPassword: !preState.editPassword
+            editPass: !preState.editPass
         }))
     };
     imageChange = (event) => {
@@ -424,4 +426,4 @@ class EditProfile extends Component {
     }
 }
 
-export default connect(null, {actionLogin})(withRouter(EditProfile));
+export default withRouter(connect(null, {actionLogin})(withRouter(EditProfile)));

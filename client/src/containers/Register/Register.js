@@ -22,16 +22,20 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import avatarImg from '../../images/avatar.jpg';
+
+const temp = {isInvalid: false, message: ''};
 
 class Register extends Component {
     constructor(props) {
         super(props);
-        const temp = {isInvalid: false, message: ''};
         this.state = {
             //avatar
-            avatarSrc: AppConstants.AVATAR_URL,
-            avatarNew: AppConstants.AVATAR_URL,
+            avatarSrc: avatarImg,
+            avatarNew: avatarImg,
             avatarBlob: null,
+            loading: false,
+            showPass: false,
             // crop
             showCropBtn: false,
             showCropDialog: false,
@@ -45,6 +49,7 @@ class Register extends Component {
             last_name: '',
             birthday: '',
             //error
+            error: '',
             _username: temp,
             _email: temp,
             _password: temp,
@@ -52,9 +57,6 @@ class Register extends Component {
             _first_name: temp,
             _last_name: temp,
             _birthday: temp,
-            error: '',
-            loading: false,
-            showPass: false
         };
 
         this.validator = new CustomValidator({
@@ -119,24 +121,28 @@ class Register extends Component {
         const {isInvalid} = this.validator.validate({username: this.state.username});
         if (isInvalid) return;
         axios.post(API.GUEST + API.VALIDATE, {username: this.state.username}).then(res => {
+            console.log('Register check exist username', res.data);
             if (res.data.username) {
                 this.setState({_username: {isInvalid: true, message: 'Name is already in use !'}})
             } else {
                 this.setState({_username: {isInvalid: false, message: ''}})
             }
-        }).catch(err=>{});
+        }).catch(err => {
+        });
     };
 
     validateEmail = () => {
         const {isInvalid} = this.validator.validate({email: this.state.email});
         if (isInvalid) return;
         axios.post(API.GUEST + API.VALIDATE, {email: this.state.email}).then(res => {
+            console.log('Register check exist email', res.data);
             if (res.data.email) {
                 this.setState({_email: {isInvalid: true, message: 'Email is already in use !'}})
             } else {
                 this.setState({_email: {isInvalid: false, message: ''}})
             }
-        }).catch(err=>{});
+        }).catch(err => {
+        });
     };
 
 
@@ -145,7 +151,7 @@ class Register extends Component {
         event.preventDefault();
         const result = this.validator.validateAll(this.state);
         const form = new FormData();
-        console.log('validate result ',result);
+        console.log('Validate result ', result);
         Object.keys(result).filter(key => (key !== 'isValid')).forEach(item => {
             this.setState({['_' + item]: result[item]});
             item !== 'password_confirm' && form.append(item, this.state[item]);
@@ -158,10 +164,10 @@ class Register extends Component {
         axios.post(API.GUEST + API.REGISTER, form).then(response => {
             const user = response.data;
             this.props.actionLogin(user);
-            // TODO retore old path
+            // TODO restore old path
             this.setState({error: ''});
             this.props.history.push('/')
-        }).catch(error=>{
+        }).catch(() => {
             this.setState({loading: false, error: 'Error! Please try again '})
         });
     };
@@ -174,7 +180,7 @@ class Register extends Component {
                 <Grid container>
                     <Grid item md={3} sm={1} xs={false}/>
                     <Grid item md={6} sm={10} xs={12}>
-                        <Paper className={styles.paper}>
+                        <Paper className={styles.wrapper}>
                             <form onSubmit={this.register}>
                                 <Grid container>
                                     <Grid item md={7} sm={7} xs={7} className={styles.main}>
@@ -200,14 +206,14 @@ class Register extends Component {
                                         <FormControl margin="normal" fullWidth className={styles.control}
                                                      error={_password.isInvalid}>
                                             <InputLabel htmlFor="password">Password</InputLabel>
-                                            <Input type={showPass?'text':'password'} id="password" name="password"
+                                            <Input type={showPass ? 'text' : 'password'} id="password" name="password"
                                                    onChange={this.onChange}
                                                    endAdornment={
                                                        <InputAdornment position="end">
                                                            <IconButton
                                                                aria-label="Toggle password visibility"
                                                                onClick={this.handleClickShowPassword}>
-                                                               {showPass ? <Visibility /> : <VisibilityOff />}
+                                                               {showPass ? <Visibility/> : <VisibilityOff/>}
                                                            </IconButton>
                                                        </InputAdornment>
                                                    }/>
@@ -286,6 +292,7 @@ class Register extends Component {
             </div>
         );
     }
+
     handleClickShowPassword = () => {
         this.setState(prevState => ({showPass: !prevState.showPass}));
     };

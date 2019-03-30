@@ -3,13 +3,14 @@ const bcrypt = require('bcrypt');
 
 const Utils = {
     addFileExtension: function (file) {
-        if (file.mimetype === 'image/jpeg' && !file.originalname.endsWith('.jpg')) {
+        const {mimetype, originalname} = file;
+        if (mimetype === 'image/jpeg' && !originalname.endsWith('.jpg')) {
             return file.originalname + '.jpg'
         }
-        if (file.mimetype === 'image/png' && !file.originalname.endsWith('.png')) {
+        if (mimetype === 'image/png' && !originalname.endsWith('.png')) {
             return file.originalname + '.png'
         }
-        return file.originalname
+        return originalname
     },
     convertLinkDropbox: (originalUrl) => {
         return originalUrl.replace('https://www.dropbox.com', 'https://dl.dropboxusercontent.com');
@@ -43,17 +44,26 @@ const Utils = {
         });
         return response2
     },
-    deleteImageFile: async (filePath) => {
+
+    deleteImageFile: (filePath) => {
+        if (filePath === AppConstant.AVATAR_URL) {
+            return;
+        }
+        const url = decodeURI(filePath);
+        const regex = /https:\/\/dl.dropboxusercontent.com\/s\/[a-zA-Z0-9]+\/(.+)\?dl=0/;
+        const result = url.match(regex);
+        const path = '/image/' + result[1];
+        console.log('Image delete path', path);
         const fetch = require('isomorphic-fetch');
         const Dropbox = require('dropbox').Dropbox;
         const dropbox = new Dropbox({
             accessToken: AppConstant.ACCESS_TOKEN_DROPBOX,
             fetch: fetch
         });
-        let res = await dropbox.filesDeleteV2({
-            path: filePath,
+         dropbox.filesDeleteV2({
+            path: path,
         });
-        // TODO
+
     },
     bcrypt: (password) => {
         return bcrypt.hashSync(password, 9);

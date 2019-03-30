@@ -14,9 +14,7 @@ router.use((request, response, next) => {
     }
 });
 router.get(API.IS_ADMIN, (request, response) => {
-
+    response.json({...request.session.user});
 });
-
-
 
 module.exports = router;

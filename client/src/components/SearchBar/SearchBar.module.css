@@ -1,4 +1,4 @@
-.wrapper{
+.wrapper {
     margin: 5px 20px;
     border-radius: 3px;
     background-color: #35b7f3;
@@ -8,11 +8,12 @@
     height: 30px;
     position: relative;
 }
-.seach_icon {
-    /*position: absolute;*/
+
+.search_icon {
     left: 0;
     top: 0;
 }
-.input{
+
+.input {
     flex: auto;
 }

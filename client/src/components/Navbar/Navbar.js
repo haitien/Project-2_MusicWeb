@@ -41,6 +41,17 @@ class Navbar extends Component {
         this.props.history.push('/user/profile/edit');
     };
 
+    LoginRegister =
+        <div className={styles.navbar_right}>
+            <Link className={styles.link} to='/login'>
+                Login
+            </Link>
+            <div className={styles.link}>/</div>
+            <Link className={styles.link} to='/register'>
+                Register
+            </Link>
+        </div>;
+
     render() {
         const {anchorMenu} = this.state;
         const {user, isLogin} = this.props;
@@ -63,17 +74,7 @@ class Navbar extends Component {
                                 <span className={styles.first_name}>{user.first_name}</span>
                             </div>
                             <ExpandMoreRounded className={styles.normal_text}/>
-                        </div> :
-                        <div className={styles.navbar_right}>
-                            <Link className={styles.link}  to='/login'>
-                                 Login
-                            </Link>
-                            <div className={styles.link}>/</div>
-                            <Link className={styles.link}  to='/register'>
-                                 Register
-                            </Link>
-                        </div>
-                    }
+                        </div> : this.LoginRegister}
                 </Grid>
                 <Grid item md={1} sm={false} xs={false}></Grid>
                 <Menu
@@ -94,4 +95,5 @@ const mapStateToProps = (state) => {
     const {isLogin, user} = state;
     return {isLogin: isLogin, user: user}
 };
+
 export default withRouter(connect(mapStateToProps, {actionLogout})(Navbar));

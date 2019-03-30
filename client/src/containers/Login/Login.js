@@ -16,6 +16,7 @@ import validator from 'validator';
 import API from '../../js/api_constants';
 import {actionLogin} from "../../js/store";
 import {connect} from "react-redux";
+import {withRouter} from "react-router-dom";
 
 class Login extends Component {
     constructor(props) {
@@ -25,14 +26,13 @@ class Login extends Component {
             password: '',
             usernameInvalid: false,
             passwordInvalid: false,
-            error: false,
-            message: '',
+            error: '',
             loading: false
         };
     }
 
     login = (event) => {
-        this.setState({loading: true, error: false});
+        this.setState({loading: true, error: ''});
         event.preventDefault();
         if (this.state.usernameInvalid || this.state.passwordInvalid) {
             this.setState({loading: false});
@@ -53,9 +53,9 @@ class Login extends Component {
             }
         }).catch(error=>{
             if (error.response.status === 401) {
-                this.setState({error: true, loading: false, message: 'Wrong username or password!'});
+                this.setState({error: 'Wrong username or password!', loading: false});
             } else {
-                this.setState({error: true, loading: false, message: 'Error! Please try again'});
+                this.setState({error: 'Error! Please try again', loading: false});
             }
         });
     };
@@ -63,9 +63,9 @@ class Login extends Component {
     inputChange = (event) => {
         const {value, name} = event.target;
         if (name === 'username') {
-            this.setState({username: value, message: ''})
+            this.setState({username: value, error: ''})
         } else {
-            this.setState({password: value, message: ''})
+            this.setState({password: value, error: ''})
         }
     };
 
@@ -76,7 +76,7 @@ class Login extends Component {
         } else {
             this.validatePassword(value)
         }
-        this.setState({error: false})
+        this.setState({error: ''})
     };
 
     validateUsername(value) {
@@ -96,14 +96,14 @@ class Login extends Component {
     }
 
     render() {
-        const {usernameInvalid, passwordInvalid, error, loading, message} = this.state;
+        const {usernameInvalid, passwordInvalid, error, loading} = this.state;
         return (
             <div>
                 {loading && <LinearProgress color='secondary'/>}
                 <Grid container>
                     <Grid item md={4} sm={3} xs={1}/>
                     <Grid item md={4} sm={6} xs={10}>
-                        <Paper className={style.paper}>
+                        <Paper className={style.wrapper}>
                             <Avatar className={style.avatar}>
                                 <LockOutlinedIcon/>
                             </Avatar>
@@ -124,14 +124,14 @@ class Login extends Component {
                                            onBlur={this.validate} error={passwordInvalid}/>
                                 </FormControl>
                                 <div className={style.alert}>{passwordInvalid && 'Password must not be empty!'}</div>
-                                <div className={style.alert}>{error && message}</div>
+                                <div className={style.alert}>{error !== '' && error}</div>
                                 <Button type="submit" fullWidth variant="contained" color="primary"
-                                        className={style.login}>
+                                        className={style.btn_login}>
                                     Sign in
                                 </Button>
                             </form>
                             <div className={style.link}>
-                                <Link to='/register'>Don't have account? Register
+                                <Link to='/register' style={{textDecoration: 'none'}}>Don't have account? Register
                                 </Link>
                             </div>
                         </Paper>
@@ -143,5 +143,5 @@ class Login extends Component {
     }
 }
 
-export default connect(null, {actionLogin})(Login);
+export default withRouter(connect(null, {actionLogin})(Login));
 

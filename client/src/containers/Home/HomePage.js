@@ -6,7 +6,7 @@ import {actionLogout, actionLogin} from "../../js/store";
 import {connect} from "react-redux";
 import API from '../../js/api_constants';
 import Footer from "../../components/Footer/Footer";
-
+import {withRouter} from "react-router-dom";
 
 class HomePage extends Component {
     constructor(props) {
@@ -23,7 +23,6 @@ class HomePage extends Component {
             <div className={styles.wrapper}>
                 <Navbar/>
                 <div style={{flex: '1 1 700px'}}>
-
                 </div>
                 <Footer/>
             </div>
@@ -31,4 +30,4 @@ class HomePage extends Component {
     }
 }
 
-export default connect(null, {actionLogout, actionLogin})(HomePage);
+export default withRouter(connect(null, {actionLogout, actionLogin})(HomePage));
