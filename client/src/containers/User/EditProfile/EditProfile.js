@@ -292,7 +292,7 @@ class EditProfile extends Component {
                                         <FormControl margin="normal" fullWidth className={styles.control}>
                                             <InputLabel htmlFor="new_password">New password</InputLabel>
                                             <Input type='password' name="new_password"
-                                                   onChange={this.onChange} disabled={!editPass}/>
+                                                   onChange={this.onChange} disabled={!editPass} onBlur={this.onChange}/>
                                         </FormControl>
                                         <div
                                             className={styles.alert}>{editPass && _new_password.isInvalid && _new_password.message}</div>
@@ -300,7 +300,7 @@ class EditProfile extends Component {
                                             <Grid item sm={6}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}>
                                                     <InputLabel htmlFor="first_name">First name</InputLabel>
-                                                    <Input name="first_name" onChange={this.onChange}
+                                                    <Input name="first_name" onChange={this.onChange} onBlur={this.onChange}
                                                            value={first_name}/>
                                                 </FormControl>
                                                 <div
@@ -309,7 +309,7 @@ class EditProfile extends Component {
                                             <Grid item sm={6}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}>
                                                     <InputLabel htmlFor="last_name">Last name</InputLabel>
-                                                    <Input name="last_name" onChange={this.onChange} value={last_name}/>
+                                                    <Input name="last_name" onChange={this.onChange} value={last_name} onBlur={this.onChange}/>
                                                 </FormControl>
                                                 <div
                                                     className={styles.alert}>{_last_name.isInvalid && _last_name.message}</div>
@@ -318,7 +318,7 @@ class EditProfile extends Component {
                                         <FormControl margin="normal" fullWidth className={styles.control}>
                                             <TextField label="Birthday" type="date" InputLabelProps={{shrink: true}}
                                                        name='birthday'
-                                                       style={{marginTop: '15px'}} onChange={this.onChange}
+                                                       style={{marginTop: '15px'}} onChange={this.onChange} onBlur={this.onChange}
                                                        value={birthday}/>
                                         </FormControl>
                                         <div className={styles.alert}>{_birthday.isInvalid && _birthday.message}</div>

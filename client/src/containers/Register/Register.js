@@ -207,7 +207,7 @@ class Register extends Component {
                                                      error={_password.isInvalid}>
                                             <InputLabel htmlFor="password">Password</InputLabel>
                                             <Input type={showPass ? 'text' : 'password'} id="password" name="password"
-                                                   onChange={this.onChange}
+                                                   onChange={this.onChange} onBlur={this.onChange}
                                                    endAdornment={
                                                        <InputAdornment position="end">
                                                            <IconButton
@@ -224,7 +224,7 @@ class Register extends Component {
                                                      error={_password_confirm.isInvalid}>
                                             <InputLabel htmlFor="password_confirm">Password confirm</InputLabel>
                                             <Input type='password' id="password_confirm" name="password_confirm"
-                                                   onChange={this.onChange}/>
+                                                   onChange={this.onChange} onBlur={this.onChange}/>
                                         </FormControl>
                                         <div
                                             className={styles.alert}>{_password_confirm.isInvalid && _password_confirm.message}</div>
@@ -233,7 +233,7 @@ class Register extends Component {
                                                 <FormControl margin="normal" fullWidth className={styles.control}
                                                              error={_first_name.isInvalid}>
                                                     <InputLabel htmlFor="first_name">First name</InputLabel>
-                                                    <Input id="first_name" name="first_name" onChange={this.onChange}/>
+                                                    <Input id="first_name" name="first_name" onChange={this.onChange} onBlur={this.onChange}/>
                                                 </FormControl>
                                                 <div
                                                     className={styles.alert}>{_first_name.isInvalid && _first_name.message}</div>
@@ -242,7 +242,7 @@ class Register extends Component {
                                                 <FormControl margin="normal" fullWidth className={styles.control}
                                                              error={_last_name.isInvalid}>
                                                     <InputLabel htmlFor="last_name">Last name</InputLabel>
-                                                    <Input id="last_name" name="last_name" onChange={this.onChange}/>
+                                                    <Input id="last_name" name="last_name" onChange={this.onChange} onBlur={this.onChange}/>
                                                 </FormControl>
                                                 <div
                                                     className={styles.alert}>{_last_name.isInvalid && _last_name.message}</div>
@@ -253,7 +253,7 @@ class Register extends Component {
                                             <TextField label="Date of birth" type="date"
                                                        InputLabelProps={{shrink: true}}
                                                        name='birthday' style={{marginTop: '15px'}}
-                                                       onChange={this.onChange}/>
+                                                       onChange={this.onChange} onBlur={this.onChange}/>
                                         </FormControl>
                                         <div
                                             className={styles.alert}>{_birthday.isInvalid && _birthday.message}</div>
