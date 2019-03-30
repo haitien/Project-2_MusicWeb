@@ -1,62 +1,33 @@
 import React, {Component} from 'react'
-import Button from "@material-ui/core/Button";
+import styles from './Homepage.module.css';
+import axios from 'axios';
+import Navbar from "../../components/Navbar/Navbar";
+import {actionLogout, actionLogin} from "../../js/store";
+import {connect} from "react-redux";
+import API from '../../js/api_constants';
+import Footer from "../../components/Footer/Footer";
+import {withRouter} from "react-router-dom";
 
 class HomePage extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            login: false,
-            user_id: '',
-            first_name: '',
-            is_admin: ''
-        };
-        fetch('/api/is_login').then(res => {
-                return res.json()
-        }).then(json => {
-            if (json) {
-                this.setState({login: true, user_id: json.id, first_name: json.first_name, is_admin: json.is_admin,username: json.username})
-            } else {
-                this.setState({login: false})
-            }
-        })
+        axios.get(API.USER + API.IS_USER).then(response => {
+            this.props.actionLogin(response.data);
+        }).catch(() => {
+            this.props.actionLogout();
+        });
     }
-
-    logout = () => {
-        fetch('/api/logout').then(res => {
-            return res.json()
-        }).then(json => {
-            if (json.result) this.setState({login: false})
-        })
-    };
 
     render() {
         return (
-            <div className="App">
-                <h1>Home Page</h1>
-                {this.state.login ?
-                    <div>Hello {this.state.first_name}
-                        <div>
-                            <Button variant='contained' onClick={this.logout} color='primary'>Log out</Button>
-                            <Button variant='contained' color='primary' onClick={() => {
-                                this.props.history.push('/user/edit')
-                            }}>Edit your profile</Button>
-                        </div>
-                    </div> :
-                    <div>
-                        <Button color='primary' variant='contained' onClick={() => {
-                            this.props.history.push('/login')
-                        }}>Login</Button>
-                        <Button color='primary' variant='contained' onClick={() => {
-                            this.props.history.push('/register')
-                        }}>Register</Button>
-                    </div>}
-
-                <Button color='primary' variant='contained' onClick={() => {
-                    this.props.history.push('/about')
-                }}>About</Button>
+            <div className={styles.wrapper}>
+                <Navbar/>
+                <div style={{flex: '1 1 700px'}}>
+                </div>
+                <Footer/>
             </div>
         );
     }
 }
 
-export default HomePage;
+export default withRouter(connect(null, {actionLogout, actionLogin})(HomePage));

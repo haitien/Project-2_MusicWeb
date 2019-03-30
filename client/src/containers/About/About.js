@@ -1,8 +1,12 @@
 import React, {Component} from 'react'
-import logo from '../logo.svg';
+import logo from '../../core/logo.svg';
+import axios from 'axios'
+
 class About extends Component {
-    componentDidMount() {
-        fetch('/api/session');
+    constructor(props) {
+        super(props)
+        axios.get('/api/session').then(res => {
+        }).catch(err=>{});
     }
 
     render() {

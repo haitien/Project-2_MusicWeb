@@ -1,0 +1,77 @@
+.big_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.wrapper {
+    margin: 0;
+    flex: auto;
+}
+
+.navbar {
+    flex: 0 0 50px;
+    background-color: #2c2c2c;
+}
+
+.brand {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.control {
+    margin: 8px 0 4px !important;
+}
+
+.big_alert {
+    text-align: center;
+    margin: 15px 0;
+    font-size: 16px;
+    color: #ff2115;
+    font-family: 'Avenir', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Helvetica Neue", Arial, sans-serif;
+}
+
+.alert {
+    font-size: 12px;
+    color: red;
+    text-align: center;
+}
+
+.avatarHolder {
+    width: 70%;
+    padding-top: 70%;
+    position: relative;
+    margin: auto;
+}
+
+.avatar {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.custom_file_upload {
+    position: absolute;
+    cursor: pointer;
+    left: 0;
+    bottom: 0;
+    height: 24px;
+}
+
+.input_avatar {
+    display: none;
+}
+
+.button {
+    margin-top: 15px !important;
+}
+
+.crop {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    cursor: pointer;
+}

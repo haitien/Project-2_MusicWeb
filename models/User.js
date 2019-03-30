@@ -1,10 +1,7 @@
-const Model = require('./Model.js');
+const Model = require('./Model');
 const pool = require('../database/dbConnect');
+const Utils = require('../js/utils');
 const bcrypt = require('bcrypt');
-
-function crypt(password) {
-    return bcrypt.hashSync(password, 10);
-}
 
 class User extends Model {
     constructor() {
@@ -12,54 +9,59 @@ class User extends Model {
     }
 
     async getUser(id) {
+        console.log('Model user => get ', id);
         const res = await pool.query(`SELECT * FROM ${this.table} WHERE id='${id}';`);
         return res.rows[0];
     }
 
     async checkLogin(username, password) {
-        const res = await pool.query(`SELECT * FROM ${this.table} WHERE username='${username}';`);
-        if (res.rows.length !== 1) return null;
-        if (!bcrypt.compareSync(password, res.rows[0].password)) {
+        console.log('Model user => checkLogin ', username, password);
+        const result = await pool.query(`SELECT * FROM ${this.table} WHERE username='${username}';`);
+        if (result.rows.length !== 1) {
             return null;
         }
-        delete res.rows[0].password;
-        return res.rows[0];
+        if (!bcrypt.compareSync(password, result.rows[0].password)) {
+            return null;
+        }
+        return result.rows[0];
     }
 
     async checkUsernameExist(username) {
-        const res = await pool.query(`SELECT * FROM ${this.table} WHERE username='${username}';`);
-        if (res.rows.length > 0) {
-            return true
-        }
-        return false
+        console.log('Model user => checkUsernameExist ', username);
+        const result = await pool.query(`SELECT * FROM ${this.table} WHERE username='${username}';`);
+        return result.rows.length > 0;
     }
 
     async checkEmailExist(email) {
-        const res = await pool.query(`SELECT * FROM ${this.table} WHERE email='${email}';`);
-        if (res.rows.length > 0) {
-            return true
+        console.log('Model user => checkEmailExist ', email);
+        const result = await pool.query(`SELECT * FROM ${this.table} WHERE email='${email}';`);
+        return result.rows.length > 0;
+    }
+
+    async addUser(request) {
+        console.log('Model user => add user ', request.body);
+        const crypt = Utils.bcrypt;
+        const {username, email, password, first_name, last_name, avatar, birthday} = request.body;
+        const result = await pool.query(
+            `INSERT INTO users( username,  password,            email,      first_name,      last_name,       avatar,     date_of_birth, is_admin) \
+                   VALUES ( '${username}', '${crypt(password)}','${email}', '${first_name}', '${last_name}', '${avatar}', '${birthday}', false)  \
+                   RETURNING id, username, email, first_name, last_name, avatar, date_of_birth, is_admin;`);
+        return result;
+    }
+
+    async editUser(request) {
+        console.log('Model user => edit user ', request.body);
+        const {username, email, new_password, first_name, last_name, avatar, birthday} = request.body;
+        let query = `UPDATE users SET email = '${email}', first_name='${first_name}', last_name='${last_name}', date_of_birth='${birthday}'`;
+        if (avatar) {
+            query += `, avatar ='${avatar}' `;
         }
-        return false
-    }
-
-    async addUser(req) {
-        const d = req.body;
-        const res = await pool.query(
-            `INSERT INTO users( username,                password,                    email,             first_name,             last_name,              avatar,               date_of_birth,        is_admin) \
-                   VALUES ( '${d.username}',        '${crypt(d.password)}',     '${d.email}',      '${d.first_name}',        '${d.last_name}',      '${d.avatar}',        '${d.birthday}',       false)  RETURNING id; `);
-        return res;
-    }
-
-    async editUser(req) {
-        const r = req.body;
-        let query = `UPDATE users \
-         SET email = '${r.email}', first_name='${r.first_name}', last_name='${r.last_name}', date_of_birth='${r.birthday}'`;
-        if (r.avatar != 'null') query += `, avatar ='${r.avatar}' `;
-        if (r.password) query += `, password ='${crypt(r.password)}' `;
-        query += ` WHERE username='${r.username}'; `;
-        console.log(query);
-        const res = await pool.query(query);
-        return res;
+        if (new_password) {
+            query += `, password ='${Utils.bcrypt(new_password)}' `;
+        }
+        query += ` WHERE username='${username}' RETURNING id, username, email, first_name, last_name, avatar, date_of_birth, is_admin; `;
+        const result = await pool.query(query);
+        return result;
     }
 }
 
