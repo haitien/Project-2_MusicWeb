@@ -2,26 +2,21 @@ class CustomValidator {
 
     constructor(validations) {
         this.validations = validations;
-        let temp = {};
-        Object.keys(validations).map(key => {
-            if (!validations[key].expectResults) {
+        this.result = true;
+        Object.keys(validations)
+            .filter(item=>(!validations[item].expectResults))
+            .forEach(key=>{
                 const length = validations[key].methods.length;
-                validations[key].expectResults = new Array(length).fill(true)
-            }
-            temp[key] = {isInvalid: false, message: ''};
-            return true;
-        });
-        this.result = {isValid: false};
+                this.validations[key].expectResults = new Array(length).fill(true)
+            });
     }
-
-    validate(state) {
+    validateOne(state) {
         const key = Object.keys(state)[0];
-        const value = state[key].toString();
-        this.result[key] = this.validateOne(value, this.validations[key]);
-        return this.result[key];
+        const value = state[key];
+        return this.validate(value, this.validations[key])
     }
 
-    validateOne(value, validation){
+    validate(value, validation){
         const args =  validation.args || [];
         const {methods, messages, expectResults} = validation;
         let message = '';
@@ -34,17 +29,20 @@ class CustomValidator {
                 return false;
             }
         });
-        return {isInvalid: !valid, message: message}
+        return message;
     }
+
     validateAll(state) {
-        this.result = {isValid: false};
         const fields = Object.keys(this.validations);
-        this.result.isValid = fields.every(field => {
-            if (!state.hasOwnProperty(field)) return true;
-            this.result[field] = this.validateOne(state[field], this.validations[field]);
-            return !this.result[field].isInvalid;
+        const result = {};
+        fields.every(field => {
+            this.isDirty[field] = true;
+            result[field] = this.validateOne(state[field], this.validations[field]);
+            return !result[field];
         });
-        return this.result;
+        console.log('dirty', this.isDirty);
+        console.log('Result', result);
+        return result;
     }
 }
 

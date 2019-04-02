@@ -24,11 +24,12 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import avatarImg from '../../images/avatar.jpg';
 
-const temp = {isInvalid: false, message: ''};
+
 
 class Register extends Component {
     constructor(props) {
         super(props);
+        const temp = {value: '', message: ''};
         this.state = {
             //avatar
             avatarSrc: avatarImg,
@@ -39,24 +40,20 @@ class Register extends Component {
             // crop
             showCropBtn: false,
             showCropDialog: false,
-            crop: {x: 20, y: 10, width: 30, height: 10, aspect: 1},
+            crop: {x: 10, y: 10, width: 30, height: 30, aspect: 1},
             // data
-            username: '',
-            email: '',
-            password: '',
-            password_confirm: '',
-            first_name: '',
-            last_name: '',
-            birthday: '',
-            //error
+            data: {
+                username: {value: '', message: ''},
+                email: {value: '', message: ''},
+                password: temp,
+                password_confirm: temp,
+                first_name: temp,
+                last_name: temp,
+                birthday: temp,
+            },
+            usernameExist: false,
+            emailExist: false,
             error: '',
-            _username: temp,
-            _email: temp,
-            _password: temp,
-            _password_confirm: temp,
-            _first_name: temp,
-            _last_name: temp,
-            _birthday: temp,
         };
 
         this.validator = new CustomValidator({
@@ -92,29 +89,35 @@ class Register extends Component {
                 methods: [validator.isBefore],
                 messages: ['Your birthday is wrong']
             }
-        })
+        });
     }
+
 
     onChange = (event) => {
         const {value, name} = event.target;
-        this.setState({[name]: value});
-        const result = this.validator.validate({[name]: value});
-        this.setState({['_' + name]: result});
-        return result.isInvalid;
+        const message = this.validator.validateOne({[name]: value});
+        console.log(name, value)
+        this.setState(prevState => {
+            prevState.data.username.value = value;
+            console.log(prevState)
+            // prevState.data[name].message = message;
+            return prevState;
+        });
+
     };
 
     onBlur = (event) => {
-        this.setState({error: ''});
-        const name = event.target.name;
-        switch (name) {
-            case 'username':
-                this.validateUsername();
-                break;
-            case 'email':
-                this.validateEmail();
-                break;
-            default:
-        }
+        // this.setState({error: ''});
+        // const name = event.target.name;
+        // switch (name) {
+        //     case 'username':
+        //         this.validateUsername();
+        //         break;
+        //     case 'email':
+        //         this.validateEmail();
+        //         break;
+        //     default:
+        // }
     };
 
     validateUsername = () => {
@@ -147,6 +150,7 @@ class Register extends Component {
 
 
     register = (event) => {
+
         this.setState({loading: true, error: ''});
         event.preventDefault();
         const result = this.validator.validateAll(this.state);
@@ -173,7 +177,8 @@ class Register extends Component {
     };
 
     render() {
-        const {_username, _email, _password, _password_confirm, _first_name, _last_name, _birthday, error, avatarSrc, avatarNew, showPass, loading} = this.state;
+        const {error, avatarSrc, avatarNew, showPass, loading} = this.state;
+        const {username, email, password, password_confirm, first_name, last_name, birthday} = this.state.data;
         return (
             <div>
                 {loading && <LinearProgress color='secondary'/>}
@@ -188,23 +193,24 @@ class Register extends Component {
                                             up</Typography>
                                         <div className={styles.big_alert}>{error !== '' && error}</div>
                                         <FormControl margin="normal" fullWidth className={styles.control}
-                                                     error={_username.isInvalid}>
+                                                     error={!!username.message}
+                                        >
                                             <InputLabel htmlFor="username">Username</InputLabel>
                                             <Input id="username" name="username" onChange={this.onChange}
                                                    onBlur={this.onBlur}/>
                                         </FormControl>
-                                        <div
-                                            className={styles.alert}>{_username.isInvalid && _username.message}</div>
+                                        <div className={styles.alert}>{username.message}</div>
                                         <FormControl margin="normal" fullWidth className={styles.control}
-                                                     error={_email.isInvalid}>
+                                                     error={!!email.message}
+                                        >
                                             <InputLabel htmlFor="email">Email</InputLabel>
                                             <Input type='email' id="email" name="email" onChange={this.onChange}
                                                    onBlur={this.onBlur}/>
                                         </FormControl>
-                                        <div
-                                            className={styles.alert}>{_email.isInvalid && _email.message}</div>
+                                        <div className={styles.alert}>{email.message}</div>
                                         <FormControl margin="normal" fullWidth className={styles.control}
-                                                     error={_password.isInvalid}>
+                                                     error={!!password.message}
+                                        >
                                             <InputLabel htmlFor="password">Password</InputLabel>
                                             <Input type={showPass ? 'text' : 'password'} id="password" name="password"
                                                    onChange={this.onChange} onBlur={this.onChange}
@@ -218,45 +224,48 @@ class Register extends Component {
                                                        </InputAdornment>
                                                    }/>
                                         </FormControl>
-                                        <div
-                                            className={styles.alert}>{_password.isInvalid && _password.message}</div>
+                                        <div className={styles.alert}>{password.message}</div>
                                         <FormControl margin="normal" fullWidth className={styles.control}
-                                                     error={_password_confirm.isInvalid}>
+                                                     error={!!password_confirm.message}
+                                        >
                                             <InputLabel htmlFor="password_confirm">Password confirm</InputLabel>
                                             <Input type='password' id="password_confirm" name="password_confirm"
                                                    onChange={this.onChange} onBlur={this.onChange}/>
                                         </FormControl>
                                         <div
-                                            className={styles.alert}>{_password_confirm.isInvalid && _password_confirm.message}</div>
+                                            className={styles.alert}>{password_confirm.message}</div>
                                         <Grid container spacing={16}>
                                             <Grid item md={6} sm={12}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}
-                                                             error={_first_name.isInvalid}>
+                                                             error={!!first_name.message}
+                                                >
                                                     <InputLabel htmlFor="first_name">First name</InputLabel>
                                                     <Input id="first_name" name="first_name" onChange={this.onChange} onBlur={this.onChange}/>
                                                 </FormControl>
                                                 <div
-                                                    className={styles.alert}>{_first_name.isInvalid && _first_name.message}</div>
+                                                    className={styles.alert}>{first_name.message}</div>
                                             </Grid>
                                             <Grid item md={6} sm={12}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}
-                                                             error={_last_name.isInvalid}>
+                                                             error={!!last_name.message}
+                                                >
                                                     <InputLabel htmlFor="last_name">Last name</InputLabel>
                                                     <Input id="last_name" name="last_name" onChange={this.onChange} onBlur={this.onChange}/>
                                                 </FormControl>
                                                 <div
-                                                    className={styles.alert}>{_last_name.isInvalid && _last_name.message}</div>
+                                                    className={styles.alert}>{last_name.message}</div>
                                             </Grid>
                                         </Grid>
                                         <FormControl margin="normal" fullWidth className={styles.control}
-                                                     error={_birthday.isInvalid}>
+                                                     error={!!birthday.message}
+                                        >
                                             <TextField label="Date of birth" type="date"
                                                        InputLabelProps={{shrink: true}}
                                                        name='birthday' style={{marginTop: '15px'}}
                                                        onChange={this.onChange} onBlur={this.onChange}/>
                                         </FormControl>
                                         <div
-                                            className={styles.alert}>{_birthday.isInvalid && _birthday.message}</div>
+                                            className={styles.alert}>{birthday.message}</div>
                                         <Button type="submit" fullWidth variant="contained" color="primary"
                                                 className={styles.button}>
                                             Create your account
