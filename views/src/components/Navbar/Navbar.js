@@ -34,6 +34,8 @@ class Navbar extends Component {
             this.props.actionLogout();
         }).catch(() => {
             // TODO show error logout fail
+            this.setState({anchorMenu: null});
+            this.props.actionLogout();
         });
     };
     onClickProfile = () => {

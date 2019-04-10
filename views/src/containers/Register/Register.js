@@ -29,7 +29,6 @@ import avatarImg from '../../images/avatar.jpg';
 class Register extends Component {
     constructor(props) {
         super(props);
-        const temp = {value: '', message: ''};
         this.state = {
             //avatar
             avatarSrc: avatarImg,
@@ -42,17 +41,15 @@ class Register extends Component {
             showCropDialog: false,
             crop: {x: 10, y: 10, width: 30, height: 30, aspect: 1},
             // data
-            data: {
-                username: {value: '', message: ''},
-                email: {value: '', message: ''},
-                password: temp,
-                password_confirm: temp,
-                first_name: temp,
-                last_name: temp,
-                birthday: temp,
-            },
-            usernameExist: false,
-            emailExist: false,
+            username: '',
+            email: '',
+            password: '',
+            password_confirm: '',
+            first_name: '',
+            last_name: '',
+            birthday: '',
+            //error
+            message: {},
             error: '',
         };
 
@@ -95,81 +92,90 @@ class Register extends Component {
 
     onChange = (event) => {
         const {value, name} = event.target;
-        const message = this.validator.validateOne({[name]: value});
-        console.log(name, value)
-        this.setState(prevState => {
-            prevState.data.username.value = value;
-            console.log(prevState)
-            // prevState.data[name].message = message;
-            return prevState;
-        });
+        const message = this.validator.validate(name, value);
+        this.setState(state => {
+            state[name] = value;
 
+            state.message[name] = message;
+            return state;
+        });
     };
 
     onBlur = (event) => {
-        // this.setState({error: ''});
-        // const name = event.target.name;
-        // switch (name) {
-        //     case 'username':
-        //         this.validateUsername();
-        //         break;
-        //     case 'email':
-        //         this.validateEmail();
-        //         break;
-        //     default:
-        // }
+        console.log('on blur');
+        this.setState({error: ''});
+        const name = event.target.name;
+        switch (name) {
+            case 'username':
+                this.validateUsername();
+                break;
+            case 'email':
+                this.validateEmail();
+                break;
+            default:
+        }
     };
 
     validateUsername = () => {
-        const {isInvalid} = this.validator.validate({username: this.state.username});
-        if (isInvalid) return;
-        axios.post(API.GUEST + API.VALIDATE, {username: this.state.username}).then(res => {
+        const {username} = this.state;
+        const result = this.validator.validate('username', username);
+        if (result) return;
+        axios.post(API.GUEST + API.VALIDATE, {username: username}).then(res => {
             console.log('Register check exist username', res.data);
-            if (res.data.username) {
-                this.setState({_username: {isInvalid: true, message: 'Name is already in use !'}})
-            } else {
-                this.setState({_username: {isInvalid: false, message: ''}})
-            }
-        }).catch(err => {
+            const message = res.data.result ? 'Name is already in use !' : '';
+            this.setState(state=>{
+                state.message.username = message;
+                return state;
+            });
+        }).catch(() => {
+
         });
     };
 
     validateEmail = () => {
-        const {isInvalid} = this.validator.validate({email: this.state.email});
-        if (isInvalid) return;
-        axios.post(API.GUEST + API.VALIDATE, {email: this.state.email}).then(res => {
+        const {email} = this.state;
+        const message = this.validator.validate('email', email);
+        if (message) return;
+        axios.post(API.GUEST + API.VALIDATE, {email: email}).then(res => {
             console.log('Register check exist email', res.data);
-            if (res.data.email) {
-                this.setState({_email: {isInvalid: true, message: 'Email is already in use !'}})
-            } else {
-                this.setState({_email: {isInvalid: false, message: ''}})
-            }
-        }).catch(err => {
+            const message = res.data.result ? 'Email is already in use !' : '';
+            this.setState(prevState=>{
+                prevState.message.email = message;
+                return prevState;
+            });
+        }).catch(() => {
+
         });
     };
 
 
-    register = (event) => {
-
+    register = () => {
+        console.log('on submit');
         this.setState({loading: true, error: ''});
-        event.preventDefault();
-        const result = this.validator.validateAll(this.state);
-        const form = new FormData();
-        console.log('Validate result ', result);
-        Object.keys(result).filter(key => (key !== 'isValid')).forEach(item => {
-            this.setState({['_' + item]: result[item]});
-            item !== 'password_confirm' && form.append(item, this.state[item]);
-        });
-        if (!result.isValid) {
+        // event.preventDefault();
+        const {username, email, password, password_confirm, first_name, last_name, birthday, avatarBlob} = this.state;
+        const result = this.validator.validateAll({username, email, password, password_confirm, first_name, last_name, birthday });
+        if (result) {
+            this.setState(state=>{
+                state.message[result.key] = result.message;
+                return state;
+            });
             this.setState({loading: false, error: ''});
             return;
         }
-        form.append('avatar', this.state.avatarBlob);
+        console.log('Validate result ', result, this.state.message);
+        const form = new FormData();
+        form.append('username', username);
+        form.append('email', email);
+        form.append('password', password);
+        form.append('first_name', first_name);
+        form.append('last_name', last_name);
+        form.append('birthday', birthday);
+        form.append('avatar', avatarBlob);
         axios.post(API.GUEST + API.REGISTER, form).then(response => {
             const user = response.data;
             this.props.actionLogin(user);
             // TODO restore old path
-            this.setState({error: ''});
             this.props.history.push('/')
         }).catch(() => {
             this.setState({loading: false, error: 'Error! Please try again '})
@@ -178,7 +184,7 @@ class Register extends Component {
 
     render() {
         const {error, avatarSrc, avatarNew, showPass, loading} = this.state;
-        const {username, email, password, password_confirm, first_name, last_name, birthday} = this.state.data;
+        const {username, email, password, password_confirm, first_name, last_name, birthday} = this.state.message;
         return (
             <div>
                 {loading && <LinearProgress color='secondary'/>}
@@ -186,34 +192,31 @@ class Register extends Component {
                     <Grid item md={3} sm={1} xs={false}/>
                     <Grid item md={6} sm={10} xs={12}>
                         <Paper className={styles.wrapper}>
-                            <form onSubmit={this.register}>
+                            <form>
                                 <Grid container>
                                     <Grid item md={7} sm={7} xs={7} className={styles.main}>
                                         <Typography component='h1' variant='h4' className={styles.header}>Sign
                                             up</Typography>
-                                        <div className={styles.big_alert}>{error !== '' && error}</div>
+                                        <div className={styles.big_alert}>{error}</div>
                                         <FormControl margin="normal" fullWidth className={styles.control}
-                                                     error={!!username.message}
-                                        >
+                                                     error={!!username}>
                                             <InputLabel htmlFor="username">Username</InputLabel>
-                                            <Input id="username" name="username" onChange={this.onChange}
+                                            <Input name="username" onChange={this.onChange}
                                                    onBlur={this.onBlur}/>
                                         </FormControl>
-                                        <div className={styles.alert}>{username.message}</div>
+                                        <div className={styles.alert}>{username}</div>
                                         <FormControl margin="normal" fullWidth className={styles.control}
-                                                     error={!!email.message}
-                                        >
+                                                     error={!!email}>
                                             <InputLabel htmlFor="email">Email</InputLabel>
-                                            <Input type='email' id="email" name="email" onChange={this.onChange}
+                                            <Input type='email' name="email" onChange={this.onChange}
                                                    onBlur={this.onBlur}/>
                                         </FormControl>
-                                        <div className={styles.alert}>{email.message}</div>
+                                        <div className={styles.alert}>{email}</div>
                                         <FormControl margin="normal" fullWidth className={styles.control}
-                                                     error={!!password.message}
-                                        >
+                                                     error={!!password}>
                                             <InputLabel htmlFor="password">Password</InputLabel>
                                             <Input type={showPass ? 'text' : 'password'} id="password" name="password"
-                                                   onChange={this.onChange} onBlur={this.onChange}
+                                                   onChange={this.onChange}
                                                    endAdornment={
                                                        <InputAdornment position="end">
                                                            <IconButton
@@ -224,50 +227,46 @@ class Register extends Component {
                                                        </InputAdornment>
                                                    }/>
                                         </FormControl>
-                                        <div className={styles.alert}>{password.message}</div>
+                                        <div className={styles.alert}>{password}</div>
                                         <FormControl margin="normal" fullWidth className={styles.control}
-                                                     error={!!password_confirm.message}
-                                        >
+                                                     error={!!password_confirm}>
                                             <InputLabel htmlFor="password_confirm">Password confirm</InputLabel>
                                             <Input type='password' id="password_confirm" name="password_confirm"
-                                                   onChange={this.onChange} onBlur={this.onChange}/>
+                                                   onChange={this.onChange}/>
                                         </FormControl>
                                         <div
-                                            className={styles.alert}>{password_confirm.message}</div>
+                                            className={styles.alert}>{password_confirm}</div>
                                         <Grid container spacing={16}>
                                             <Grid item md={6} sm={12}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}
-                                                             error={!!first_name.message}
-                                                >
+                                                             error={!!first_name}>
                                                     <InputLabel htmlFor="first_name">First name</InputLabel>
-                                                    <Input id="first_name" name="first_name" onChange={this.onChange} onBlur={this.onChange}/>
+                                                    <Input id="first_name" name="first_name" onChange={this.onChange}/>
                                                 </FormControl>
                                                 <div
-                                                    className={styles.alert}>{first_name.message}</div>
+                                                    className={styles.alert}>{first_name}</div>
                                             </Grid>
                                             <Grid item md={6} sm={12}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}
-                                                             error={!!last_name.message}
-                                                >
+                                                             error={!!last_name}>
                                                     <InputLabel htmlFor="last_name">Last name</InputLabel>
-                                                    <Input id="last_name" name="last_name" onChange={this.onChange} onBlur={this.onChange}/>
+                                                    <Input id="last_name" name="last_name" onChange={this.onChange}/>
                                                 </FormControl>
                                                 <div
-                                                    className={styles.alert}>{last_name.message}</div>
+                                                    className={styles.alert}>{last_name}</div>
                                             </Grid>
                                         </Grid>
                                         <FormControl margin="normal" fullWidth className={styles.control}
-                                                     error={!!birthday.message}
-                                        >
+                                                     error={!!birthday}>
                                             <TextField label="Date of birth" type="date"
                                                        InputLabelProps={{shrink: true}}
                                                        name='birthday' style={{marginTop: '15px'}}
-                                                       onChange={this.onChange} onBlur={this.onChange}/>
+                                                       onChange={this.onChange} error={!!birthday}/>
                                         </FormControl>
                                         <div
-                                            className={styles.alert}>{birthday.message}</div>
-                                        <Button type="submit" fullWidth variant="contained" color="primary"
-                                                className={styles.button}>
+                                            className={styles.alert}>{birthday}</div>
+                                        <Button fullWidth variant="contained" color="primary"
+                                                className={styles.button} onClick={this.register}>
                                             Create your account
                                         </Button>
                                     </Grid>
