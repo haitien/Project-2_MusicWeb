@@ -12,12 +12,12 @@ class UserController extends Controller {
             const {username, email} = data;
             if (username) {
                 const result = await User.checkUsernameExist(username);
-                response.json({username: result});
+                response.json({result: result});
                 return
             }
             if (email) {
                 const result = await User.checkEmailExist(email);
-                response.json({email: result});
+                response.json({result: result});
                 return
             }
             response.end()

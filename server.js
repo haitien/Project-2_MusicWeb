@@ -28,11 +28,11 @@ app.use(API.ADMIN, admin_router);
 app.use(express.static(path.join(__dirname, 'public')));
 if (process.env.NODE_ENV === "production") {
     // Serve any static files
-    app.use(express.static(path.join(__dirname, 'client/build')));
+    app.use(express.static(path.join(__dirname, 'views/build')));
 
     // Handle React routing, return all requests to React app
     app.get('*', (request, response) => {
-        response.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+        response.sendFile(path.join(__dirname, 'views/build', 'index.html'));
     });
 }
 

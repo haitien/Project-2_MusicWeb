@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const API = require('../js/api_constants');
 const upload = multer();
-// const upload = multer({dest: 'client/build/static/upload/'})
+// const upload = multer({dest: 'views/build/static/upload/'})
 
 const router = express.Router();
 

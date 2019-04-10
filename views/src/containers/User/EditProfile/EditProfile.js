@@ -33,7 +33,6 @@ import avatarImg from '../../../images/avatar.jpg';
 class EditProfile extends Component {
     constructor(props) {
         super(props);
-        const temp = {isInvalid: false, message: ''};
         this.state = {
             avatarSrc: avatarImg,
             avatarNew: avatarImg,
@@ -55,12 +54,7 @@ class EditProfile extends Component {
             birthday: '',
             //error
             error: '',
-            _email: temp,
-            _old_password: temp,
-            _new_password: temp,
-            _first_name: temp,
-            _last_name: temp,
-            _birthday: temp,
+            message: {}
         };
 
 
@@ -113,10 +107,13 @@ class EditProfile extends Component {
 
     onChange = (event) => {
         const {value, name} = event.target;
-        this.setState({[name]: value});
-        const result = this.validator.validate({[name]: value});
-        this.setState({['_' + name]: result});
-        return result.isInvalid;
+        const message = this.validator.validate(name, value);
+        this.setState(state => {
+            state[name] = value;
+
+            state.message[name] = message;
+            return state;
+        });
     };
 
     onBlur = (event) => {
@@ -136,36 +133,49 @@ class EditProfile extends Component {
     validateEmail() {
         const {email, data} = this.state;
         if (email === data.email) {
-            this.setState({_email: {isInvalid: false, message: ''}});
+            // this.setState({_email: {isInvalid: false, message: ''}});
+            this.setState(state=>{
+                state.message.email = '';
+                return state;
+            });
             return
         }
-        const {isInvalid} = this.validator.validate({email: email});
-        if (isInvalid) return;
-        axios.post(API.GUEST + API.VALIDATE, {email: email}).then(response => {
-            console.log('EditProfile => check exist email', response.data);
-            if (response.data.email) {
-                this.setState({_email: {isInvalid: true, message: 'Email is already in use !'}})
-            } else {
-                this.setState({_email: {isInvalid: false, message: ''}})
-            }
-        }).catch(err => {
+        const message = this.validator.validate('email', email);
+        if (message) return;
+        axios.post(API.GUEST + API.VALIDATE, {email: email}).then(res => {
+            console.log('Register check exist email', res.data);
+            const message = res.data.result ? 'Email is already in use !' : '';
+            this.setState(prevState=>{
+                prevState.message.email = message;
+                return prevState;
+            });
+        }).catch(() => {
+
         });
     }
 
     validatePassword() {
         const {old_password, data} = this.state;
         if (old_password === data.password) {
-            this.setState({_old_password: {isInvalid: false, message: ''}});
-            return
+            // this.setState({_old_password: {isInvalid: false, message: ''}});
+            this.setState(state=>{
+                state.message.old_password = '';
+                return state;
+            });
+            return;
         }
-        const {isInvalid} = this.validator.validate({old_password: old_password});
-        if (isInvalid) return;
+        const message = this.validator.validate('old_password', old_password);
+        if (message) return;
         axios.post(API.USER + API.CHECK_PASSWORD, {password: old_password}).then(response => {
             console.log('EditProfile => check right password', response.data);
             if (response.data.result) {
-                this.setState({_old_password: {isInvalid: false, message: ''}})
+                this.setState(state=>{
+                    state.message.old_password = '';
+                })
             } else {
-                this.setState({_old_password: {isInvalid: true, message: 'Not match your current password!'}})
+                this.setState(state=>{
+                    state.message.old_password = 'Not match your current password!';
+                })
             }
         }).catch(() => {
             this.props.history.push('/401');
@@ -183,26 +193,37 @@ class EditProfile extends Component {
             temp = {email, first_name, last_name, birthday};
         }
         const result = this.validator.validateAll(temp);
-        console.log('Validate result', temp);
-        const form = new FormData();
-        Object.keys(result).filter(key => (key !== 'isValid')).forEach(item => {
-            this.setState({['_' + item]: result[item]});
-            form.append(item, this.state[item]);
-        });
-        if (!result.isValid) {
+        if (result) {
+            this.setState(state=>{
+                state.message[result.key] = result.message;
+                return state;
+            });
             this.setState({loading: false, error: ''});
             return;
         }
+
+        console.log('Validate result', this.state.message);
+        const form = new FormData();
+        form.append('email', email);
+        if (editPass) {
+            form.append('old_password', old_password);
+            form.append('new_password', new_password);
+        }
+        form.append('first_name', first_name);
+        form.append('last_name', last_name);
+        form.append('birthday', birthday);
+        form.append('avatar', avatarBlob);
+
         if (!editPass && email === data.email && first_name === data.first_name && last_name === data.last_name && birthday === data.date_of_birth && !avatarBlob) {
             this.setState({loading: false, error: 'Nothing has changed!'});
             return;
         }
-        form.append('avatar', this.state.avatarBlob);
         axios.post(API.USER + API.EDIT_PROFILE, form).then(response => {
             this.setState({error: '', loading: false});
             this.props.actionLogin(response.data);
             this.props.history.push('/')
         }).catch(error => {
+            this.setState({loading: false});
             if (error.response.status === 401) {
                 this.props.history.push('/401');
             } else {
@@ -212,8 +233,8 @@ class EditProfile extends Component {
     };
 
     render() {
-        const {email, first_name, last_name, birthday, error, data, avatarNew, avatarSrc, editPass, showPass, loading} = this.state;
-        const {_email, _first_name, _last_name, _old_password, _new_password, _birthday} = this.state;
+        const {error, data, avatarNew, avatarSrc, editPass, showPass, loading} = this.state;
+        const {email, first_name, last_name, old_password, new_password, birthday} = this.state.message;
         return (
             <div className={styles.big_wrapper}>
                 <div className={styles.navbar}>
@@ -262,9 +283,9 @@ class EditProfile extends Component {
                                             <InputLabel htmlFor="email">Email</InputLabel>
                                             <Input type='email' name="email" onChange={this.onChange}
                                                    onBlur={this.onBlur}
-                                                   value={email}/>
+                                                   value={this.state.email} error={!!email}/>
                                         </FormControl>
-                                        <div className={styles.alert}>{_email.isInvalid && _email.message}</div>
+                                        <div className={styles.alert}>{email}</div>
                                         <FormControlLabel style={{width: '100%'}}
                                                           control={
                                                               <Checkbox
@@ -275,7 +296,7 @@ class EditProfile extends Component {
                                         <FormControl margin="normal" fullWidth className={styles.control}>
                                             <InputLabel htmlFor="old_password">Old password</InputLabel>
                                             <Input type={showPass ? 'text' : 'password'} name="old_password"
-                                                   onChange={this.onChange} onBlur={this.onBlur}
+                                                   onChange={this.onChange} onBlur={this.onBlur} error={!!old_password}
                                                    disabled={!editPass}
                                                    endAdornment={
                                                        <InputAdornment position="end">
@@ -288,40 +309,40 @@ class EditProfile extends Component {
                                                    }/>
                                         </FormControl>
                                         <div
-                                            className={styles.alert}>{editPass && _old_password.isInvalid && _old_password.message}</div>
+                                            className={styles.alert}>{editPass && old_password}</div>
                                         <FormControl margin="normal" fullWidth className={styles.control}>
                                             <InputLabel htmlFor="new_password">New password</InputLabel>
                                             <Input type='password' name="new_password"
-                                                   onChange={this.onChange} disabled={!editPass}/>
+                                                   onChange={this.onChange} disabled={!editPass} onBlur={this.onChange} error={!!new_password}/>
                                         </FormControl>
                                         <div
-                                            className={styles.alert}>{editPass && _new_password.isInvalid && _new_password.message}</div>
+                                            className={styles.alert}>{editPass && new_password}</div>
                                         <Grid container spacing={16}>
                                             <Grid item sm={6}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}>
                                                     <InputLabel htmlFor="first_name">First name</InputLabel>
-                                                    <Input name="first_name" onChange={this.onChange}
-                                                           value={first_name}/>
+                                                    <Input name="first_name" onChange={this.onChange} onBlur={this.onChange}
+                                                           value={this.state.first_name} error={!!first_name}/>
                                                 </FormControl>
                                                 <div
-                                                    className={styles.alert}>{_first_name.isInvalid && _first_name.message}</div>
+                                                    className={styles.alert}>{first_name}</div>
                                             </Grid>
                                             <Grid item sm={6}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}>
                                                     <InputLabel htmlFor="last_name">Last name</InputLabel>
-                                                    <Input name="last_name" onChange={this.onChange} value={last_name}/>
+                                                    <Input name="last_name" onChange={this.onChange} value={this.state.last_name} onBlur={this.onChange} error={!!last_name}/>
                                                 </FormControl>
                                                 <div
-                                                    className={styles.alert}>{_last_name.isInvalid && _last_name.message}</div>
+                                                    className={styles.alert}>{last_name}</div>
                                             </Grid>
                                         </Grid>
                                         <FormControl margin="normal" fullWidth className={styles.control}>
                                             <TextField label="Birthday" type="date" InputLabelProps={{shrink: true}}
                                                        name='birthday'
-                                                       style={{marginTop: '15px'}} onChange={this.onChange}
-                                                       value={birthday}/>
+                                                       style={{marginTop: '15px'}} onChange={this.onChange} onBlur={this.onChange}
+                                                       value={this.state.birthday} error={!!birthday}/>
                                         </FormControl>
-                                        <div className={styles.alert}>{_birthday.isInvalid && _birthday.message}</div>
+                                        <div className={styles.alert}>{birthday}</div>
                                         <Button type="submit" fullWidth variant="contained" color="secondary"
                                                 className={styles.button}>
                                             Edit your profile

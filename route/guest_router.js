@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const upload = multer();
-// const upload = multer({dest: 'client/build/static/upload/'})
+// const upload = multer({dest: 'views/build/static/upload/'})
 const LoginController = require('../controllers/LoginController');
 const UserController = require('../controllers/UserController');
 const router = express.Router();
