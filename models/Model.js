@@ -1,4 +1,4 @@
-const pool = require('../database/dbConnect');
+const pool = require('../database/db-connect');
 
 class Model {
     constructor(table, idColumn) {
@@ -8,7 +8,14 @@ class Model {
 
     async getAll() {
         const res = await pool.query(`SELECT * FROM ${this.table}`);
-        return res.rows;
+        return res;
+    }
+
+    async get(id) {
+        console.log(`Model ${this.table} => get ${id}`);
+        const res = await pool.query(`SELECT * FROM ${this.table} WHERE ${this.idColumn}='${id}';`)
+        console.log('get', res[0]);
+        return res[0];
     }
 }
 

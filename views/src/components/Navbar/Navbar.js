@@ -5,10 +5,10 @@ import Grid from "@material-ui/core/Grid";
 import ExpandMoreRounded from '@material-ui/icons/ExpandMoreRounded'
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import {actionLogout} from "../../js/store";
+import {actionLogout} from "../../core/store";
 import {connect} from "react-redux";
 import axios from 'axios';
-import API from '../../js/api_constants';
+import API from '../../core/api_constants';
 import {Link} from "react-router-dom";
 import SearchBar from "../SearchBar/SearchBar";
 import {withRouter} from "react-router-dom";

@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const API = require('../js/api_constants');
+const API = require('./api-constants');
 const upload = multer();
 // const upload = multer({dest: 'views/build/static/upload/'})
 

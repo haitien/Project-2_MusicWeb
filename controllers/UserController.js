@@ -1,11 +1,10 @@
-const Controller = require('./Controller');
 const User = require('../models/User');
 const validator = require('validator');
-const AppConstant = require('../js/app_constants');
-const Utils = require('../js/utils');
+const AppConstant = require('../core/app-constants');
+const Utils = require('../core/utils');
 
 
-class UserController extends Controller {
+class UserController {
     async validateData(request, response, data) {
         try {
             console.log('User controller => validateData', data);
@@ -39,7 +38,7 @@ class UserController extends Controller {
     async getUser(req, response, id) {
         try {
             console.log('User controller => get user', id);
-            const result = await User.getUser(id);
+            const result = await User.get(id);
             if (result) {
                 response.json(result)
             } else {
@@ -85,13 +84,12 @@ class UserController extends Controller {
             return
         }
         request.body.avatar = url;
-        request.body.birthday = Utils.convertToDDMMMYYY(birthday);
         console.log('Add user before postgres sql', request.body);
         try {
             const result = await User.addUser(request);
-            request.session.user = result.rows[0];
-            response.json({...result.rows[0]});
-            console.log('Add user sql success ', result.rows[0])
+            request.session.user = result;
+            response.json({...result});
+            console.log('Add user sql success ', result)
         } catch (e) {
             console.log('Add user sql error', e);
             response.status(503).end();
@@ -144,13 +142,12 @@ class UserController extends Controller {
             return
         }
         request.body.username = username;
-        request.body.birthday = Utils.convertToDDMMMYYY(birthday);
         console.log('Edit user before postgres sql', request.body);
         try {
             const result = await User.editUser(request);
-            request.session.user = result.rows[0];
-            response.json({...result.rows[0]});
-            console.log('Edit user sql success ', result.rows[0]);
+            request.session.user = result;
+            response.json({...result});
+            console.log('Edit user sql success ', result);
         } catch (e) {
             console.log('Edit user sql error', e);
             response.status(503).end();

@@ -13,8 +13,8 @@ import axios from 'axios';
 import React, {Component} from 'react';
 import style from './Login.module.css';
 import validator from 'validator';
-import API from '../../js/api_constants';
-import {actionLogin} from "../../js/store";
+import API from '../../core/api_constants';
+import {actionLogin} from "../../core/store";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
 

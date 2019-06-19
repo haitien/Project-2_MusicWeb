@@ -1,7 +1,6 @@
-const Controller = require('./Controller');
 const User = require('../models/User');
 
-class LoginController extends Controller {
+class LoginController {
     async login(request, response, username, password) {
         try {
             console.log('Login controller => login ', username, password);

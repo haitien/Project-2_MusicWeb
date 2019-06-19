@@ -10,12 +10,12 @@ import Button from "@material-ui/core/Button";
 import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css';
 import DialogTitle from "@material-ui/core/DialogTitle";
-import CustomValidator from '../../js/custom_validator';
+import CustomValidator from '../../core/custom_validator';
 import validator from 'validator';
 import axios from 'axios';
-import AppConstants from '../../js/app_constant'
-import API from '../../js/api_constants';
-import {actionLogin} from "../../js/store";
+import AppConstants from '../../core/app_constant'
+import API from '../../core/api_constants';
+import {actionLogin} from "../../core/store";
 import {connect} from "react-redux";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import InputAdornment from "@material-ui/core/InputAdornment";

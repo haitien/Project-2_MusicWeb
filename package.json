@@ -6,7 +6,7 @@
   "scripts": {
     "client": "cd views && npm start",
     "server": "nodemon server.js",
-    "migrate": "node database/migrate.js&& node database/seed/seeder.js",
+    "migration": "node database/migration.js&& node database/seeder.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
     "production": "cd views && npm run build && cd .. && export NODE_ENV=production|| set NODE_ENV=production&& nodemon server.js",
     "production2": "export NODE_ENV=production|| set NODE_ENV=production&& nodemon server.js",
@@ -32,8 +32,9 @@
     "express-session": "^1.15.6",
     "isomorphic-fetch": "^2.2.1",
     "multer": "^1.4.1",
-    "pg": "^7.9.0",
+    "mysql": "^2.17.1",
     "session-file-store": "^1.2.0",
+    "util": "^0.12.0",
     "validator": "^10.11.0"
   },
   "devDependencies": {

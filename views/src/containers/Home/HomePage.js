@@ -2,9 +2,9 @@ import React, {Component} from 'react'
 import styles from './Homepage.module.css';
 import axios from 'axios';
 import Navbar from "../../components/Navbar/Navbar";
-import {actionLogout, actionLogin} from "../../js/store";
+import {actionLogout, actionLogin} from "../../core/store";
 import {connect} from "react-redux";
-import API from '../../js/api_constants';
+import API from '../../core/api_constants';
 import Footer from "../../components/Footer/Footer";
 import {withRouter} from "react-router-dom";
 

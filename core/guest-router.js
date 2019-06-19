@@ -5,7 +5,7 @@ const upload = multer();
 const LoginController = require('../controllers/LoginController');
 const UserController = require('../controllers/UserController');
 const router = express.Router();
-const API = require('../js/api_constants');
+const API = require('./api-constants');
 
 router.use(function(request, response, next) {
    next();

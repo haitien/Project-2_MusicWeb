@@ -1,10 +1,9 @@
 const express = require('express');
 const multer = require('multer');
-const API = require('../js/api_constants');
+const API = require('./api-constants');
 const upload = multer();
 // const upload = multer({dest: 'views/build/static/upload/'})
 const UserController = require('../controllers/UserController');
-const LoginController = require('../controllers/LoginController');
 const router = express.Router();
 
 router.use((request, response, next) => {

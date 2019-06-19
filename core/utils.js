@@ -1,4 +1,4 @@
-const AppConstant = require('./app_constants');
+const AppConstant = require('./app-constants');
 const bcrypt = require('bcrypt');
 
 const Utils = {

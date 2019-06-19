@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const app = express();
 const FileStore = require('session-file-store')(session);
-const API = require('./js/api_constants');
+const API = require('./core/api-constants');
 const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
@@ -17,11 +17,11 @@ app.use(session({
     cookie: { maxAge: 600*1000 }
 }));
 
-const guest_router = require('./route/guest_router');
+const guest_router = require('./core/guest-router');
 app.use(API.GUEST, guest_router);
-const user_router = require('./route/user_router');
+const user_router = require('./core/user-router');
 app.use(API.USER, user_router);
-const admin_router = require('./route/admin_router');
+const admin_router = require('./core/admin-router');
 app.use(API.ADMIN, admin_router);
 
 

@@ -15,13 +15,13 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import {Link, withRouter} from "react-router-dom";
 import validator from 'validator';
-import CustomValidate from '../../../js/custom_validator';
-import API from './../../../js/api_constants';
-import AppConstants from '../../../js/app_constant';
+import CustomValidate from '../../../core/custom_validator';
+import API from '../../../core/api_constants';
+import AppConstants from '../../../core/app_constant';
 import axios from 'axios';
-import Utils from "../../../js/utils";
+import Utils from "../../../core/utils";
 import Crop from '@material-ui/icons/Crop';
-import {actionLogin} from "../../../js/store";
+import {actionLogin} from "../../../core/store";
 import {connect} from "react-redux";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -90,7 +90,7 @@ class EditProfile extends Component {
         });
         axios.get(API.USER + API.EDIT_PROFILE).then(response => {
             console.log('EditProfile => get profile', response.data);
-            response.data.date_of_birth = Utils.formatDate(response.data.date_of_birth);
+            response.data.birthday = Utils.formatDate(response.data.birthday)
             this.setState({
                 avatarNew: response.data.avatar,
                 avatarSrc: response.data.avatar,
@@ -98,7 +98,7 @@ class EditProfile extends Component {
                 email: response.data.email,
                 first_name: response.data.first_name,
                 last_name: response.data.last_name,
-                birthday: response.data.date_of_birth,
+                birthday: response.data.birthday,
             })
         }).catch(() => {
             this.props.history.push('/401')
@@ -134,7 +134,7 @@ class EditProfile extends Component {
         const {email, data} = this.state;
         if (email === data.email) {
             // this.setState({_email: {isInvalid: false, message: ''}});
-            this.setState(state=>{
+            this.setState(state => {
                 state.message.email = '';
                 return state;
             });
@@ -145,7 +145,7 @@ class EditProfile extends Component {
         axios.post(API.GUEST + API.VALIDATE, {email: email}).then(res => {
             console.log('Register check exist email', res.data);
             const message = res.data.result ? 'Email is already in use !' : '';
-            this.setState(prevState=>{
+            this.setState(prevState => {
                 prevState.message.email = message;
                 return prevState;
             });
@@ -158,7 +158,7 @@ class EditProfile extends Component {
         const {old_password, data} = this.state;
         if (old_password === data.password) {
             // this.setState({_old_password: {isInvalid: false, message: ''}});
-            this.setState(state=>{
+            this.setState(state => {
                 state.message.old_password = '';
                 return state;
             });
@@ -169,11 +169,11 @@ class EditProfile extends Component {
         axios.post(API.USER + API.CHECK_PASSWORD, {password: old_password}).then(response => {
             console.log('EditProfile => check right password', response.data);
             if (response.data.result) {
-                this.setState(state=>{
+                this.setState(state => {
                     state.message.old_password = '';
                 })
             } else {
-                this.setState(state=>{
+                this.setState(state => {
                     state.message.old_password = 'Not match your current password!';
                 })
             }
@@ -194,7 +194,7 @@ class EditProfile extends Component {
         }
         const result = this.validator.validateAll(temp);
         if (result) {
-            this.setState(state=>{
+            this.setState(state => {
                 state.message[result.key] = result.message;
                 return state;
             });
@@ -212,9 +212,10 @@ class EditProfile extends Component {
         form.append('first_name', first_name);
         form.append('last_name', last_name);
         form.append('birthday', birthday);
+        console.log(birthday);
         form.append('avatar', avatarBlob);
 
-        if (!editPass && email === data.email && first_name === data.first_name && last_name === data.last_name && birthday === data.date_of_birth && !avatarBlob) {
+        if (!editPass && email === data.email && first_name === data.first_name && last_name === data.last_name && birthday === data.birthday && !avatarBlob) {
             this.setState({loading: false, error: 'Nothing has changed!'});
             return;
         }
@@ -249,7 +250,7 @@ class EditProfile extends Component {
                     <Grid container>
                         <Grid item md={3} sm={1} xs={false}/>
                         <Grid item md={6} sm={10} xs={12}>
-                            <Typography variant='h5'>Edit your profile</Typography>
+                            <Typography variant='h5' style={{marginBottom:'15px'}}>Edit your profile</Typography>
                             <Grid container>
                                 <Grid item sm={1} xs={false}/>
                                 <Grid item sm={10} xs={12}>
@@ -313,7 +314,8 @@ class EditProfile extends Component {
                                         <FormControl margin="normal" fullWidth className={styles.control}>
                                             <InputLabel htmlFor="new_password">New password</InputLabel>
                                             <Input type='password' name="new_password"
-                                                   onChange={this.onChange} disabled={!editPass} onBlur={this.onChange} error={!!new_password}/>
+                                                   onChange={this.onChange} disabled={!editPass} onBlur={this.onChange}
+                                                   error={!!new_password}/>
                                         </FormControl>
                                         <div
                                             className={styles.alert}>{editPass && new_password}</div>
@@ -321,7 +323,8 @@ class EditProfile extends Component {
                                             <Grid item sm={6}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}>
                                                     <InputLabel htmlFor="first_name">First name</InputLabel>
-                                                    <Input name="first_name" onChange={this.onChange} onBlur={this.onChange}
+                                                    <Input name="first_name" onChange={this.onChange}
+                                                           onBlur={this.onChange}
                                                            value={this.state.first_name} error={!!first_name}/>
                                                 </FormControl>
                                                 <div
@@ -330,7 +333,9 @@ class EditProfile extends Component {
                                             <Grid item sm={6}>
                                                 <FormControl margin="normal" fullWidth className={styles.control}>
                                                     <InputLabel htmlFor="last_name">Last name</InputLabel>
-                                                    <Input name="last_name" onChange={this.onChange} value={this.state.last_name} onBlur={this.onChange} error={!!last_name}/>
+                                                    <Input name="last_name" onChange={this.onChange}
+                                                           value={this.state.last_name} onBlur={this.onChange}
+                                                           error={!!last_name}/>
                                                 </FormControl>
                                                 <div
                                                     className={styles.alert}>{last_name}</div>
@@ -339,7 +344,8 @@ class EditProfile extends Component {
                                         <FormControl margin="normal" fullWidth className={styles.control}>
                                             <TextField label="Birthday" type="date" InputLabelProps={{shrink: true}}
                                                        name='birthday'
-                                                       style={{marginTop: '15px'}} onChange={this.onChange} onBlur={this.onChange}
+                                                       style={{marginTop: '15px'}} onChange={this.onChange}
+                                                       onBlur={this.onChange}
                                                        value={this.state.birthday} error={!!birthday}/>
                                         </FormControl>
                                         <div className={styles.alert}>{birthday}</div>
